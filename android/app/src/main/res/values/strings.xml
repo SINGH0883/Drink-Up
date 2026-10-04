@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Drink Up</string>
+    <string name="title_activity_main">Drink Up</string>
+    <string name="package_name">com.singh0883.drinkup</string>
+    <string name="custom_url_scheme">com.singh0883.drinkup</string>
+</resources>

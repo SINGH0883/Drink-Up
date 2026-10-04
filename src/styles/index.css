@@ -1,0 +1,156 @@
+@import './tokens.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+    -webkit-user-select: none;
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    font-family: 'Plus Jakarta Sans', 'Inter', system-ui, sans-serif;
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(var(--color-surface), 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Water Wave Animations */
+@keyframes waveFlow1 {
+  0% { transform: translateX(0) translateZ(0) scaleY(1); }
+  50% { transform: translateX(-25%) translateZ(0) scaleY(1.15); }
+  100% { transform: translateX(-50%) translateZ(0) scaleY(1); }
+}
+
+@keyframes waveFlow2 {
+  0% { transform: translateX(0) translateZ(0) scaleY(1.1); }
+  50% { transform: translateX(25%) translateZ(0) scaleY(0.9); }
+  100% { transform: translateX(50%) translateZ(0) scaleY(1.1); }
+}
+
+@keyframes floatBubble {
+  0% {
+    transform: translateY(15px) scale(0.6);
+    opacity: 0;
+  }
+  30% {
+    opacity: 0.8;
+  }
+  80% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-80px) scale(1.1);
+    opacity: 0;
+  }
+}
+
+@keyframes splashPop {
+  0% {
+    transform: scale(0.8) translateY(10px);
+    opacity: 0;
+  }
+  40% {
+    transform: scale(1.1) translateY(-6px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes ringPulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.6);
+    transform: scale(0.98);
+  }
+  70% {
+    box-shadow: 0 0 0 25px rgba(56, 189, 248, 0);
+    transform: scale(1.02);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(56, 189, 248, 0);
+    transform: scale(1);
+  }
+}
+
+@keyframes waveHand {
+  0%, 100% { transform: rotate(0deg); }
+  20%, 60% { transform: rotate(14deg); }
+  40%, 80% { transform: rotate(-10deg); }
+}
+
+.animate-wave-hand {
+  display: inline-block;
+  transform-origin: 70% 70%;
+  animation: waveHand 2.2s infinite ease-in-out;
+}
+
+.animate-wave-1 {
+  animation: waveFlow1 6s linear infinite;
+}
+
+.animate-wave-2 {
+  animation: waveFlow2 4.5s ease-in-out infinite;
+}
+
+.animate-bubble-1 {
+  animation: floatBubble 2.8s ease-in-out infinite;
+}
+
+.animate-bubble-2 {
+  animation: floatBubble 3.6s ease-in-out infinite 0.7s;
+}
+
+.animate-bubble-3 {
+  animation: floatBubble 2.2s ease-in-out infinite 1.4s;
+}
+
+.animate-splash-pop {
+  animation: splashPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.animate-ring-pulse {
+  animation: ringPulse 0.9s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 4px;
+}
+
+/* Safe area padding utilities */
+.pt-safe {
+  padding-top: max(var(--safe-area-top), 12px);
+}
+
+.pb-safe {
+  padding-bottom: max(var(--safe-area-bottom), 16px);
+}
