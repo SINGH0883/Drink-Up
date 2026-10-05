@@ -12,6 +12,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Vite](https://img.shields.io/badge/Vite-6.2-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
 [📥 **Download Android APK (< 5 MB)**](https://github.com/SINGH0883/Drink-Up/raw/main/drink-up.apk)
 
@@ -104,52 +105,6 @@ You can download the pre-built Android APK directly from this repository:
 
 ---
 
-## 🚀 Getting Started (Development Setup)
-
-### Prerequisites
-- [Node.js](https://nodejs.org/) (v18 or newer)
-- [npm](https://www.npmjs.com/)
-- [Android Studio](https://developer.android.com/studio) (for Android native builds)
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/SINGH0883/Drink-Up.git
-cd Drink-Up
-```
-
-### 2. Install Dependencies
-```bash
-npm install
-```
-
-### 3. Run Development Server
-```bash
-npm run dev
-```
-Open your browser and navigate to `http://localhost:5173`.
-
-### 4. Build for Production & Sync Android
-```bash
-# Build web production bundle
-npm run build
-
-# Sync assets to Capacitor Android project
-npx cap sync android
-```
-
-### 5. Run on Android Device / Emulator
-```bash
-# Open Android Studio project
-npx cap open android
-
-# Or build debug APK directly via command line
-cd android
-./gradlew assembleDebug
-```
-The compiled APK will be available in `android/app/build/outputs/apk/debug/app-debug.apk`.
-
----
-
 ## 📂 Project Structure
 
 ```
@@ -157,7 +112,8 @@ Drink-Up/
 ├── android/                   # Native Android Capacitor project
 ├── public/                    # Static assets & icons
 │   ├── logo.png
-│   └── favicon.ico
+│   ├── hydrate-bg.webp
+│   └── circle-water.gif
 ├── src/
 │   ├── components/            # UI components
 │   │   ├── common/            # Header, Navigation, Modal wrappers
@@ -173,7 +129,7 @@ Drink-Up/
 │   ├── types/                 # TypeScript interfaces and type definitions
 │   ├── App.tsx                # App root & navigation router
 │   └── main.tsx               # Entry point
-├── drink-up.apk               # Pre-built ready-to-install Android APK
+├── drink-up.apk               # Pre-built ready-to-install Android APK (< 5 MB)
 ├── package.json
 ├── tailwind.config.js
 └── vite.config.ts
@@ -183,7 +139,7 @@ Drink-Up/
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
