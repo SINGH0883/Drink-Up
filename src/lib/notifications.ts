@@ -10,7 +10,7 @@ import {
   ACTION_TYPES,
   NOTIFICATION_CHANNELS,
 } from './constants';
-import { AlertType, MessageStyle, NotificationSettings, ReminderSlot, UserSettings } from '../types';
+import { AlertType, MessageStyle, NotificationSettings, ReminderSlot, SoundTone, UserSettings } from '../types';
 import { playTone, speakNotification } from './sound';
 import { haptic } from './haptics';
 
@@ -20,37 +20,139 @@ export const notificationService = {
    */
   async initialize(): Promise<void> {
     try {
-      // 1. Create channels for Android
+      // 1. Clean up legacy channels that had missing sound resources or older importance levels
+      const existing = await LocalNotifications.listChannels().catch(() => ({ channels: [] }));
+      if (existing && existing.channels) {
+        for (const ch of existing.channels) {
+          if (ch.id.startsWith('drinkup_') && !ch.id.includes('_v4')) {
+            await LocalNotifications.deleteChannel({ id: ch.id }).catch(() => {});
+          }
+        }
+      }
+
+      // 2. Create channels for Android with sound & vibration
       const channels: Channel[] = [
+        // Sound & Vibration Channels (Default: MAX importance)
         {
-          id: NOTIFICATION_CHANNELS.SOUND,
-          name: 'Sound Only Alerts',
-          description: 'Hydration reminders with sound only',
-          importance: 4, // High
-          visibility: 1, // Public
+          id: NOTIFICATION_CHANNELS.BOTH_WATER_DROP,
+          name: 'Water Drop (Sound & Vibration)',
+          description: 'Hydration reminders with water droplet chime and vibration',
+          importance: 5,
+          visibility: 1,
+          sound: 'water_drop.wav',
+          vibration: true,
+          lights: true,
+          lightColor: '#2196F3',
+        },
+        {
+          id: NOTIFICATION_CHANNELS.BOTH_GENTLE_CHIME,
+          name: 'Gentle Chime (Sound & Vibration)',
+          description: 'Hydration reminders with melodic chime and vibration',
+          importance: 5,
+          visibility: 1,
+          sound: 'gentle_chime.wav',
+          vibration: true,
+          lights: true,
+          lightColor: '#2196F3',
+        },
+        {
+          id: NOTIFICATION_CHANNELS.BOTH_SOFT_BELL,
+          name: 'Soft Bell (Sound & Vibration)',
+          description: 'Hydration reminders with bell tone and vibration',
+          importance: 5,
+          visibility: 1,
+          sound: 'soft_bell.wav',
+          vibration: true,
+          lights: true,
+          lightColor: '#2196F3',
+        },
+        {
+          id: NOTIFICATION_CHANNELS.BOTH_CRYSTAL_PING,
+          name: 'Crystal Ping (Sound & Vibration)',
+          description: 'Hydration reminders with crystal ping and vibration',
+          importance: 5,
+          visibility: 1,
+          sound: 'crystal_ping.wav',
+          vibration: true,
+          lights: true,
+          lightColor: '#2196F3',
+        },
+        {
+          id: NOTIFICATION_CHANNELS.BOTH_DEFAULT,
+          name: 'Default Alert (Sound & Vibration)',
+          description: 'Hydration reminders with alert tone and vibration',
+          importance: 5,
+          visibility: 1,
           sound: 'beep.wav',
+          vibration: true,
+          lights: true,
+          lightColor: '#2196F3',
+        },
+
+        // Sound Only Channels
+        {
+          id: NOTIFICATION_CHANNELS.SOUND_WATER_DROP,
+          name: 'Water Drop (Sound Only)',
+          description: 'Hydration reminders with water drop sound',
+          importance: 5,
+          visibility: 1,
+          sound: 'water_drop.wav',
           vibration: false,
           lights: true,
           lightColor: '#2196F3',
         },
         {
-          id: NOTIFICATION_CHANNELS.BUZZ,
-          name: 'Vibration Only Alerts',
-          description: 'Hydration reminders with vibration only',
-          importance: 4, // High
+          id: NOTIFICATION_CHANNELS.SOUND_GENTLE_CHIME,
+          name: 'Gentle Chime (Sound Only)',
+          description: 'Hydration reminders with gentle chime sound',
+          importance: 5,
           visibility: 1,
-          vibration: true,
-          sound: undefined,
+          sound: 'gentle_chime.wav',
+          vibration: false,
           lights: true,
           lightColor: '#2196F3',
         },
         {
-          id: NOTIFICATION_CHANNELS.BOTH,
-          name: 'Sound & Vibration Alerts',
-          description: 'Hydration reminders with both sound and vibration',
-          importance: 4, // High
+          id: NOTIFICATION_CHANNELS.SOUND_SOFT_BELL,
+          name: 'Soft Bell (Sound Only)',
+          description: 'Hydration reminders with soft bell sound',
+          importance: 5,
+          visibility: 1,
+          sound: 'soft_bell.wav',
+          vibration: false,
+          lights: true,
+          lightColor: '#2196F3',
+        },
+        {
+          id: NOTIFICATION_CHANNELS.SOUND_CRYSTAL_PING,
+          name: 'Crystal Ping (Sound Only)',
+          description: 'Hydration reminders with crystal ping sound',
+          importance: 5,
+          visibility: 1,
+          sound: 'crystal_ping.wav',
+          vibration: false,
+          lights: true,
+          lightColor: '#2196F3',
+        },
+        {
+          id: NOTIFICATION_CHANNELS.SOUND_DEFAULT,
+          name: 'Default Alert (Sound Only)',
+          description: 'Hydration reminders with standard sound',
+          importance: 5,
           visibility: 1,
           sound: 'beep.wav',
+          vibration: false,
+          lights: true,
+          lightColor: '#2196F3',
+        },
+
+        // Buzz & Silent Channels
+        {
+          id: NOTIFICATION_CHANNELS.BUZZ,
+          name: 'Vibration Only Alerts',
+          description: 'Hydration reminders with vibration only',
+          importance: 4,
+          visibility: 1,
           vibration: true,
           lights: true,
           lightColor: '#2196F3',
@@ -58,11 +160,10 @@ export const notificationService = {
         {
           id: NOTIFICATION_CHANNELS.SILENT,
           name: 'Silent Notifications',
-          description: 'Hydration reminders delivered silently in tray',
-          importance: 2, // Low
+          description: 'Hydration reminders delivered silently',
+          importance: 2,
           visibility: 1,
           vibration: false,
-          sound: undefined,
         },
       ];
 
@@ -70,7 +171,7 @@ export const notificationService = {
         await LocalNotifications.createChannel(channel).catch(() => {});
       }
 
-      // 2. Register Interactive Action Types
+      // 3. Register Interactive Action Types
       await LocalNotifications.registerActionTypes({
         types: [
           {
@@ -123,17 +224,40 @@ export const notificationService = {
     }
   },
 
-  getChannelIdForType(type: AlertType): string {
-    switch (type) {
-      case 'sound':
-        return NOTIFICATION_CHANNELS.SOUND;
-      case 'buzz':
-        return NOTIFICATION_CHANNELS.BUZZ;
-      case 'silent':
-        return NOTIFICATION_CHANNELS.SILENT;
-      case 'both':
+  getChannelIdForType(type: AlertType, tone: SoundTone = 'water_drop'): string {
+    if (type === 'silent') return NOTIFICATION_CHANNELS.SILENT;
+    if (type === 'buzz') return NOTIFICATION_CHANNELS.BUZZ;
+
+    const isBoth = type === 'both';
+    switch (tone) {
+      case 'water_drop':
+        return isBoth ? NOTIFICATION_CHANNELS.BOTH_WATER_DROP : NOTIFICATION_CHANNELS.SOUND_WATER_DROP;
+      case 'gentle_chime':
+        return isBoth ? NOTIFICATION_CHANNELS.BOTH_GENTLE_CHIME : NOTIFICATION_CHANNELS.SOUND_GENTLE_CHIME;
+      case 'soft_bell':
+        return isBoth ? NOTIFICATION_CHANNELS.BOTH_SOFT_BELL : NOTIFICATION_CHANNELS.SOUND_SOFT_BELL;
+      case 'crystal_ping':
+        return isBoth ? NOTIFICATION_CHANNELS.BOTH_CRYSTAL_PING : NOTIFICATION_CHANNELS.SOUND_CRYSTAL_PING;
+      case 'voice_announcement':
       default:
-        return NOTIFICATION_CHANNELS.BOTH;
+        return isBoth ? NOTIFICATION_CHANNELS.BOTH_WATER_DROP : NOTIFICATION_CHANNELS.SOUND_WATER_DROP;
+    }
+  },
+
+  getSoundFileName(type: AlertType, tone: SoundTone = 'water_drop'): string | undefined {
+    if (type === 'silent' || type === 'buzz') return undefined;
+    switch (tone) {
+      case 'water_drop':
+        return 'water_drop.wav';
+      case 'gentle_chime':
+        return 'gentle_chime.wav';
+      case 'soft_bell':
+        return 'soft_bell.wav';
+      case 'crystal_ping':
+        return 'crystal_ping.wav';
+      case 'voice_announcement':
+      default:
+        return 'water_drop.wav';
     }
   },
 
@@ -187,7 +311,8 @@ export const notificationService = {
       return;
     }
 
-    const channelId = this.getChannelIdForType(notifSettings.alertType);
+    const channelId = this.getChannelIdForType(notifSettings.alertType, notifSettings.soundTone);
+    const soundFile = this.getSoundFileName(notifSettings.alertType, notifSettings.soundTone);
     const notificationsToSchedule: LocalNotificationSchema[] = [];
 
     const now = new Date();
@@ -218,6 +343,9 @@ export const notificationService = {
         title,
         body,
         channelId,
+        sound: soundFile,
+        smallIcon: 'ic_stat_drink',
+        largeIcon: 'ic_launcher',
         actionTypeId: notifSettings.actionButtons ? ACTION_TYPES.HYDRATION_ACTION : undefined,
         schedule: {
           at: scheduledDate,
@@ -228,6 +356,8 @@ export const notificationService = {
         extra: {
           amountMl: slot.targetMl || userSettings.defaultCupMl,
           slotId: slot.id,
+          tone: notifSettings.soundTone,
+          userName: userSettings.userName,
         },
       });
     }
@@ -249,7 +379,8 @@ export const notificationService = {
     notifSettings: NotificationSettings,
     todayCurrentMl: number
   ): Promise<void> {
-    const channelId = this.getChannelIdForType(notifSettings.alertType);
+    const channelId = this.getChannelIdForType(notifSettings.alertType, notifSettings.soundTone);
+    const soundFile = this.getSoundFileName(notifSettings.alertType, notifSettings.soundTone);
     const { title, body } = this.getMessageText(
       notifSettings.messageStyle,
       userSettings.defaultCupMl,
@@ -281,6 +412,9 @@ export const notificationService = {
               title: `[Test] ${title}`,
               body,
               channelId,
+              sound: soundFile,
+              smallIcon: 'ic_stat_drink',
+              largeIcon: 'ic_launcher',
               actionTypeId: notifSettings.actionButtons ? ACTION_TYPES.HYDRATION_ACTION : undefined,
               schedule: { at: new Date(Date.now() + 500) },
               extra: { amountMl: userSettings.defaultCupMl },
@@ -300,7 +434,8 @@ export const notificationService = {
   async triggerGoalReachedNotification(userSettings: UserSettings, notifSettings: NotificationSettings): Promise<void> {
     if (!notifSettings.enabled || !notifSettings.goalReachedAlert) return;
 
-    const channelId = this.getChannelIdForType(notifSettings.alertType);
+    const channelId = this.getChannelIdForType(notifSettings.alertType, notifSettings.soundTone);
+    const soundFile = this.getSoundFileName(notifSettings.alertType, notifSettings.soundTone);
     try {
       await LocalNotifications.schedule({
         notifications: [
@@ -309,6 +444,7 @@ export const notificationService = {
             title: '🎉 Daily Goal Achieved!',
             body: `Awesome job! You reached your ${userSettings.dailyGoalMl} ml hydration goal today.`,
             channelId,
+            sound: soundFile,
             schedule: { at: new Date(Date.now() + 200) },
           },
         ],
@@ -332,3 +468,4 @@ export const notificationService = {
     }
   },
 };
+

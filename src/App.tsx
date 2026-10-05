@@ -10,6 +10,7 @@ import { RemindersPage } from './pages/RemindersPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { NotificationSettingsPage } from './pages/NotificationSettingsPage';
 import { OnboardingPage } from './pages/OnboardingPage';
+import { InAppNotificationBanner } from './components/common/InAppNotificationBanner';
 import { storage } from './lib/storage';
 import { haptic } from './lib/haptics';
 
@@ -34,6 +35,8 @@ export function App() {
   const {
     notifSettings,
     activeSlots,
+    inAppBanner,
+    dismissInAppBanner,
     updateNotifSettings,
     requestPermission,
     toggleMasterSwitch,
@@ -156,6 +159,13 @@ export function App() {
         </>
       )}
       </div>
+
+      {/* Global In-App Notification Banner */}
+      <InAppNotificationBanner
+        notification={inAppBanner}
+        onDismiss={dismissInAppBanner}
+        onDrinkAction={(amount) => addWater(amount)}
+      />
 
       {subPage === 'none' && <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />}
     </div>

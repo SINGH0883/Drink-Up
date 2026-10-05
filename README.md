@@ -13,7 +13,7 @@
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Vite](https://img.shields.io/badge/Vite-6.2-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 
-[📥 **Download Android APK (drink-up.apk)**](https://github.com/SINGH0883/Drink-Up/raw/main/drink-up.apk)
+[📥 **Download Android APK (< 5 MB)**](https://github.com/SINGH0883/Drink-Up/raw/main/drink-up.apk)
 
 </div>
 
@@ -21,30 +21,39 @@
 
 ## 📱 About Drink Up
 
-**Drink Up** is a smart, modern hydration companion designed to help you build and maintain healthy daily drinking habits. Built with **React 19**, **Tailwind CSS**, and **Capacitor 7**, Drink Up offers fluid animations, personalized hydration targets, intelligent reminders, voice alerts, and detailed hydration analytics.
+**Drink Up** is a smart, modern hydration companion designed to help you build and maintain healthy daily drinking habits. Built with **React 19**, **Tailwind CSS**, and **Capacitor 7**, Drink Up offers fluid animations, personalized hydration targets, intelligent reminders, voice alerts, and detailed hydration analytics — packaged in an ultra-optimized **< 5 MB Android APK**.
 
 ---
 
 ## ✨ Key Features
 
-### 🌊 1. Interactive Fluid Hydration Ring
-- **Dual Liquid Wave Animation**: Real-time SVG fluid fill that dynamically responds to daily intake.
+### 🌊 1. Interactive Dual-Color Hydration Ring
+- **Dual Meter Gauge**: Green arc for completed intake and Red arc for remaining goal.
+- **Hydration Animation Orb**: Embedded water animation with dynamic rising liquid level.
 - **Micro-Bubbles & Splash Effects**: Visual and haptic feedback with floating volume increments (+250ml) whenever water is logged.
 - **Celebration Confetti**: Dynamic confetti explosion when reaching your daily hydration goal.
 
-### 🎯 2. Personalized Smart Goal Calculator
+### 📊 2. Real-Time Status Bar
+- **Slim Two-Tone Progress Strip**: Placed conveniently between quick log buttons and the navigation bar.
+- Shows live amount consumed (with completion percentage) vs remaining milliliters at a single glance.
+
+### 👋 3. Dynamic 3D Greeting Header
+- **3D Animated Waving Hand**: Welcoming greeting with time-of-day contextual messages (*Good morning*, *Good afternoon*, *Good evening*).
+- **Streak & Reminders Shortcut**: Direct access to your consecutive streak counter and alarm manager.
+
+### 🎯 4. Personalized Smart Goal Calculator
 - Calculates optimal daily intake based on:
   - Weight & Body Metrics
   - Activity Level (Sedentary, Moderate, Active)
   - Climate & Weather (Normal, Warm, Hot)
   - Biological Factors & Custom overrides
 
-### ⚡ 3. Quick-Add & Custom Logging
-- One-tap quick add buttons with custom presets (150ml, 250ml, 350ml, 500ml).
+### ⚡ 5. Quick-Add & Custom Logging
+- One-tap quick add buttons with custom presets (150ml, 250ml, 500ml).
 - Custom volume selector for exact amounts.
 - Floating **Undo Toast** to instantly revert accidental entries.
 
-### ⏰ 4. Smart Reminders & Voice Alerts
+### ⏰ 6. Smart Reminders, Voice Alerts & In-App Banners
 - **Interval Reminders**: Automatically schedule alerts every 30m, 1h, 1.5h, 2h, or 3h.
 - **Custom Time Slots**: Set exact daily alarm times.
 - **Wake & Sleep Smart Hours**: Prevents notifications during your sleep cycle.
@@ -52,16 +61,17 @@
   - 🗣️ **Text-to-Speech (Voice)**: Speaks motivational hydration reminders.
   - 🔔 **Sound Beep**: Gentle acoustic notification chime.
   - 📳 **Haptic Vibration**: Discreet tactile alerts.
+  - 📲 **In-App Toast Banner**: Direct top banner alert with sound on in-app reminder events.
 
-### 📊 5. Comprehensive Analytics & Streak Tracking
+### 📈 7. Comprehensive Analytics & Streak Tracking
 - **Weekly Trend Charts**: Interactive bar graphs highlighting daily goal attainment.
 - **Drink Breakdown**: Chronological log with timestamps and volumes.
 - **Streak Tracker**: Tracks consecutive days of hitting your goal to keep you motivated.
 
-### 🎨 6. Premium UI & Customization
+### 🎨 8. Premium UI & Performance Optimization
+- **Ultra Lightweight**: ProGuard & R8 resource shrinking keeps the full release APK at **~4.78 MB** (< 5 MB).
 - **Theme Modes**: Seamless Light and Dark mode support.
 - **Units**: Supports both Metric (`ml`) and Imperial (`fl oz`).
-- **Modern Design**: Gradient headers, glassmorphism cards, and smooth micro-interactions.
 
 ---
 
@@ -69,7 +79,7 @@
 
 You can download the pre-built Android APK directly from this repository:
 
-👉 **[Download `drink-up.apk`](https://github.com/SINGH0883/Drink-Up/raw/main/drink-up.apk)**
+👉 **[Download `drink-up.apk` (4.78 MB)](https://github.com/SINGH0883/Drink-Up/raw/main/drink-up.apk)**
 
 ### Installation Steps on Android:
 1. Download `drink-up.apk` onto your Android smartphone.

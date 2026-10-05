@@ -42,7 +42,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   onClearAllData,
 }) => {
   const [userName, setUserName] = useState<string>(settings.userName || '');
-  const [userAge, setUserAge] = useState<string>(settings.age?.toString() || '24');
+  const [userAge, setUserAge] = useState<string>(settings.age ? settings.age.toString() : '');
   const [weightInput, setWeightInput] = useState<string>(settings.weightKg?.toString() || '');
   const [showWeightCalc, setShowWeightCalc] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);

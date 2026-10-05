@@ -1,7 +1,8 @@
 import React from 'react';
-import { GlassWater, Coffee, Sparkles, Plus } from 'lucide-react';
+import { GlassWater, Coffee, Plus, Droplets } from 'lucide-react';
 import { ML_TO_OZ_RATIO } from '../../lib/constants';
 import { UnitType } from '../../types';
+import { haptic } from '../../lib/haptics';
 
 interface QuickAddButtonsProps {
   onAdd: (amountMl: number) => void;
@@ -17,36 +18,52 @@ export const QuickAddButtons: React.FC<QuickAddButtonsProps> = ({ onAdd, onOpenC
     return `${ml} ml`;
   };
 
+  const handleAdd = (amount: number) => {
+    haptic.success();
+    onAdd(amount);
+  };
+
   const buttons = [
     {
       amount: 150,
       label: 'Small Cup',
       icon: Coffee,
+      badgeColor: 'from-amber-500/15 to-orange-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
+      iconColor: 'text-amber-600 dark:text-amber-400',
     },
     {
       amount: 250,
       label: 'Glass',
       icon: GlassWater,
       highlight: true,
+      tag: 'POPULAR',
+      badgeColor: 'from-sky-500/25 to-blue-600/25 text-sky-600 dark:text-sky-300 border-sky-400/40',
+      iconColor: 'text-sky-500 dark:text-sky-300',
     },
     {
       amount: 500,
       label: 'Bottle',
-      icon: Sparkles,
+      icon: Droplets,
+      badgeColor: 'from-teal-500/15 to-emerald-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
+      iconColor: 'text-teal-600 dark:text-teal-400',
     },
   ];
 
   return (
-    <div className="w-full px-4 my-2">
-      <div className="flex items-center justify-between mb-2.5">
-        <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
-          Quick Log
+    <div className="w-full px-3.5 my-1">
+      <div className="flex items-center justify-between mb-2 px-1">
+        <span className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 bg-white/90 dark:bg-slate-900/90 px-2.5 py-1 rounded-full backdrop-blur-md border border-sky-100 dark:border-slate-800 flex items-center gap-1.5 shadow-2xs">
+          <Droplets className="w-3.5 h-3.5 text-sky-500" />
+          <span>Quick Log</span>
         </span>
         <button
-          onClick={onOpenCustom}
-          className="text-xs font-semibold text-accent hover:text-accent-hover flex items-center gap-1 active:scale-95 transition-all"
+          onClick={() => {
+            haptic.tap();
+            onOpenCustom();
+          }}
+          className="text-xs font-bold text-sky-600 dark:text-sky-400 flex items-center gap-1 px-3 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 border border-sky-200/80 dark:border-slate-800 active:scale-95 transition-all shadow-xs backdrop-blur-md"
         >
-          <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
+          <Plus className="w-3.5 h-3.5 stroke-[3]" />
           <span>Custom</span>
         </button>
       </div>
@@ -57,26 +74,34 @@ export const QuickAddButtons: React.FC<QuickAddButtonsProps> = ({ onAdd, onOpenC
           return (
             <button
               key={btn.amount}
-              onClick={() => onAdd(btn.amount)}
-              className={`flex flex-col items-center justify-center p-3.5 rounded-2xl border transition-all duration-150 active:scale-95 ${
+              onClick={() => handleAdd(btn.amount)}
+              className={`relative flex flex-col items-center justify-center p-3 rounded-2xl border transition-all duration-200 active:scale-95 group overflow-hidden ${
                 btn.highlight
-                  ? 'bg-surface border-accent text-accent dark:bg-surface dark:border-accent/60 shadow-sm'
-                  : 'bg-surface border-surface-border text-foreground hover:border-accent/40 shadow-sm'
+                  ? 'bg-white dark:bg-slate-900 border-sky-400 ring-2 ring-sky-400/30 shadow-lg shadow-sky-500/15'
+                  : 'bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 hover:border-sky-300 shadow-sm'
               }`}
             >
+              {/* Popular Badge */}
+              {btn.tag && (
+                <div className="absolute top-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-sky-500 to-blue-600 text-white text-[8px] font-black tracking-widest uppercase shadow-2xs">
+                  {btn.tag}
+                </div>
+              )}
+
+              {/* Glowing Icon Container */}
               <div
-                className={`w-10 h-10 rounded-xl flex items-center justify-center mb-1.5 ${
-                  btn.highlight
-                    ? 'bg-accent/10 text-accent dark:bg-accent/20'
-                    : 'bg-surface-subtle text-muted-foreground'
-                }`}
+                className={`w-10 h-10 rounded-xl bg-gradient-to-br border flex items-center justify-center mb-1.5 transition-transform duration-200 group-hover:scale-110 shadow-2xs ${
+                  btn.badgeColor
+                } ${btn.highlight ? 'mt-2' : ''}`}
               >
-                <Icon className="w-5 h-5 stroke-[2]" />
+                <Icon className={`w-5 h-5 stroke-[2.2] ${btn.iconColor}`} />
               </div>
-              <span className="text-sm font-bold text-foreground">
+
+              <span className="text-sm font-black text-slate-900 dark:text-white tracking-tight">
                 +{formatAmount(btn.amount)}
               </span>
-              <span className="text-[11px] font-medium text-muted-foreground mt-0.5">
+
+              <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
                 {btn.label}
               </span>
             </button>

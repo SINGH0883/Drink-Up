@@ -29,7 +29,7 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
 
   // Form State - all required
   const [name, setName] = useState<string>('');
-  const [age, setAge] = useState<number>(24);
+  const [age, setAge] = useState<number | ''>('');
   const [weightKg, setWeightKg] = useState<number>(65);
   const [dailyGoalMl, setDailyGoalMl] = useState<number>(2250);
   const [cupSizeMl, setCupSizeMl] = useState<number>(250);
@@ -40,7 +40,7 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
   const isStepValid = () => {
     switch (step) {
       case 1:
-        return name.trim().length > 0 && age >= 5 && age <= 120;
+        return name.trim().length > 0 && typeof age === 'number' && age >= 5 && age <= 120;
       case 2:
         return weightKg >= 20 && weightKg <= 250;
       case 3:
@@ -87,7 +87,7 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
 
     await onComplete({
       userName: name.trim() || 'Friend',
-      age: age || 24,
+      age: typeof age === 'number' && age > 0 ? age : undefined,
       weightKg: weightKg || 65,
       dailyGoalMl: dailyGoalMl || 2250,
       defaultCupMl: cupSizeMl || 250,
@@ -170,11 +170,14 @@ export const OnboardingPage: React.FC<OnboardingPageProps> = ({
                 </label>
                 <input
                   type="number"
-                  value={age || ''}
-                  onChange={(e) => setAge(Number(e.target.value))}
+                  value={age}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setAge(val === '' ? '' : Number(val));
+                  }}
                   min={5}
                   max={120}
-                  placeholder="Age (years)"
+                  placeholder="Your Age (e.g. 24)"
                   className="w-full px-4 py-3.5 rounded-2xl bg-surface border border-surface-border text-foreground text-sm font-semibold focus:outline-none focus:border-accent shadow-sm"
                   required
                 />
