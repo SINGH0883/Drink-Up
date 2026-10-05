@@ -1,16 +1,14 @@
-import React from 'react';
-import { GlassWater, Coffee, Plus, Droplets } from 'lucide-react';
+import { GlassWater, Coffee, Droplets } from 'lucide-react';
 import { ML_TO_OZ_RATIO } from '../../lib/constants';
 import { UnitType } from '../../types';
 import { haptic } from '../../lib/haptics';
 
 interface QuickAddButtonsProps {
   onAdd: (amountMl: number) => void;
-  onOpenCustom: () => void;
   unit: UnitType;
 }
 
-export const QuickAddButtons: React.FC<QuickAddButtonsProps> = ({ onAdd, onOpenCustom, unit }) => {
+export const QuickAddButtons: React.FC<QuickAddButtonsProps> = ({ onAdd, unit }) => {
   const formatAmount = (ml: number) => {
     if (unit === 'oz') {
       return `${Math.round(ml * ML_TO_OZ_RATIO)} oz`;
@@ -56,16 +54,6 @@ export const QuickAddButtons: React.FC<QuickAddButtonsProps> = ({ onAdd, onOpenC
           <Droplets className="w-3.5 h-3.5 text-sky-500" />
           <span>Quick Log</span>
         </span>
-        <button
-          onClick={() => {
-            haptic.tap();
-            onOpenCustom();
-          }}
-          className="text-xs font-bold text-sky-600 dark:text-sky-400 flex items-center gap-1 px-3 py-1 rounded-full bg-white/95 dark:bg-slate-900/95 border border-sky-200/80 dark:border-slate-800 active:scale-95 transition-all shadow-xs backdrop-blur-md"
-        >
-          <Plus className="w-3.5 h-3.5 stroke-[3]" />
-          <span>Custom</span>
-        </button>
       </div>
 
       <div className="grid grid-cols-3 gap-2.5">

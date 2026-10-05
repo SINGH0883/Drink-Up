@@ -10,6 +10,9 @@ import {
   Bell,
   Play,
   MessageSquare,
+  Sparkles,
+  Heart,
+  ExternalLink,
 } from 'lucide-react';
 import { Header } from '../components/common/Header';
 import {
@@ -384,6 +387,34 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               <span>Reset All Data & Logs</span>
             </button>
           )}
+        </div>
+
+        {/* Creator Watermark */}
+        <div className="pt-4 pb-6 flex flex-col items-center justify-center gap-1.5 opacity-90 hover:opacity-100 transition-opacity">
+          <a
+            href="https://github.com/SINGH0883"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface border border-surface-border shadow-xs backdrop-blur-md hover:border-accent/40 active:scale-95 transition-all group"
+          >
+            <Sparkles className="w-3.5 h-3.5 text-accent animate-pulse" />
+            <span className="text-[11px] font-bold text-foreground">
+              Drink Up <span className="text-muted-foreground font-medium">v1.0</span>
+            </span>
+            <span className="text-[10px] text-muted-foreground">•</span>
+            <span className="text-[11px] font-extrabold bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent group-hover:underline flex items-center gap-1">
+              SINGH0883
+              <ExternalLink className="w-3 h-3 text-sky-500 opacity-70 group-hover:opacity-100" />
+            </span>
+          </a>
+          <a
+            href="https://github.com/SINGH0883"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[10px] font-medium text-muted-foreground/80 hover:text-foreground transition-colors flex items-center gap-1"
+          >
+            Crafted with <Heart className="w-3 h-3 text-red-500 fill-red-500 inline animate-bounce" /> by <span className="font-bold underline decoration-accent/40">SINGH0883</span>
+          </a>
         </div>
       </main>
     </div>

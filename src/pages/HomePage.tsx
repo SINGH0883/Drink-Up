@@ -129,7 +129,6 @@ export const HomePage: React.FC<HomePageProps> = ({
           {/* Quick Add Log Buttons */}
           <QuickAddButtons
             onAdd={onAddWater}
-            onOpenCustom={() => setIsCustomOpen(true)}
             unit={settings.unit}
           />
 
