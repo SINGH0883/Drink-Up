@@ -59,22 +59,19 @@ export const HomePage: React.FC<HomePageProps> = ({
   }, [settings.userName]);
 
   return (
-    <div className="flex flex-col min-h-full pb-6 relative overflow-hidden bg-background">
-      {/* Full Page Ambient Faded Hydration Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 flex items-center justify-center">
+    <div className="flex-1 flex flex-col min-h-full pb-2 relative overflow-hidden bg-background">
+      {/* Full Page Ambient Faded Hydration Background with smooth gradient fade */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <img
           src="/hydrate-bg.webp"
           alt="Hydrate Background"
-          className="w-full h-full object-cover opacity-25 dark:opacity-20 pointer-events-none scale-105"
+          className="w-full h-full object-cover object-top opacity-20 dark:opacity-15 pointer-events-none [mask-image:linear-gradient(to_bottom,black_50%,transparent_95%)]"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-white/20 via-transparent via-50% to-white/95 dark:from-slate-950/25 dark:via-transparent dark:to-slate-950/95 pointer-events-none" />
+        <div className="absolute inset-0 bg-gradient-to-b from-sky-400/15 via-transparent to-background dark:from-sky-950/40 dark:via-transparent dark:to-background pointer-events-none" />
       </div>
 
-      {/* Rich Extended Sky Blue Ambient Water Gradient Aura */}
-      <div className="absolute top-0 left-0 right-0 h-[400px] bg-gradient-to-b from-sky-400/20 via-sky-300/10 to-transparent pointer-events-none z-0" />
-
       {/* Modern Sky Blue Gradient Header with Integrated 3D Waving Hand Greeting */}
-      <header className="sticky top-0 z-30 bg-gradient-to-b from-sky-400/35 via-sky-300/20 to-transparent dark:from-sky-950/60 dark:via-sky-900/30 dark:to-transparent backdrop-blur-xl px-4 pt-safe pb-2 transition-all relative z-10">
+      <header className="sticky top-0 z-30 bg-gradient-to-b from-sky-400/25 via-sky-300/10 to-transparent dark:from-sky-950/50 dark:via-sky-900/20 dark:to-transparent backdrop-blur-xl px-4 pt-safe pb-2 transition-all relative z-10 shrink-0">
         <div className="flex items-center justify-between min-h-[48px] max-w-md mx-auto">
           {/* Left: 3D Waving Hand + Drink Up Title & Greeting */}
           <div className="flex items-center gap-2.5 min-w-0">
@@ -116,9 +113,9 @@ export const HomePage: React.FC<HomePageProps> = ({
         </div>
       </header>
 
-      <main className="flex-1 px-3.5 flex flex-col items-center justify-between max-w-md mx-auto w-full gap-2 relative z-10">
+      <main className="flex-1 px-3.5 flex flex-col items-center justify-between max-w-md mx-auto w-full py-1 relative z-10">
         {/* Central 3D Liquid Orb */}
-        <div className="my-auto py-1">
+        <div className="flex-1 flex items-center justify-center my-auto py-2">
           <WaterRing
             currentMl={stats.todayTotalMl}
             goalMl={stats.goalMl}
@@ -127,44 +124,47 @@ export const HomePage: React.FC<HomePageProps> = ({
           />
         </div>
 
-        {/* Quick Add Log Buttons */}
-        <QuickAddButtons
-          onAdd={onAddWater}
-          onOpenCustom={() => setIsCustomOpen(true)}
-          unit={settings.unit}
-        />
+        {/* Lower Action & Status Group */}
+        <div className="w-full flex flex-col gap-1.5 mt-auto pb-1">
+          {/* Quick Add Log Buttons */}
+          <QuickAddButtons
+            onAdd={onAddWater}
+            onOpenCustom={() => setIsCustomOpen(true)}
+            unit={settings.unit}
+          />
 
-        {/* Slim Two-Tone Status Bar (Between Quick Log & Navbar) */}
-        {(() => {
-          const displayCurrent = settings.unit === 'oz' ? Math.round(stats.todayTotalMl * ML_TO_OZ_RATIO) : stats.todayTotalMl;
-          const displayGoal = settings.unit === 'oz' ? Math.round(stats.goalMl * ML_TO_OZ_RATIO) : stats.goalMl;
-          const unitLabel = settings.unit === 'oz' ? 'fl oz' : 'ml';
-          const remaining = Math.max(0, displayGoal - displayCurrent);
-          const percent = Math.min(100, Math.round((stats.todayTotalMl / (stats.goalMl || 2000)) * 100));
+          {/* Slim Two-Tone Status Bar */}
+          {(() => {
+            const displayCurrent = settings.unit === 'oz' ? Math.round(stats.todayTotalMl * ML_TO_OZ_RATIO) : stats.todayTotalMl;
+            const displayGoal = settings.unit === 'oz' ? Math.round(stats.goalMl * ML_TO_OZ_RATIO) : stats.goalMl;
+            const unitLabel = settings.unit === 'oz' ? 'fl oz' : 'ml';
+            const remaining = Math.max(0, displayGoal - displayCurrent);
+            const percent = Math.min(100, Math.round((stats.todayTotalMl / (stats.goalMl || 2000)) * 100));
 
-          return (
-            <div className="w-full px-4 py-2 rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-sky-100/90 dark:border-slate-800 shadow-sm backdrop-blur-md flex flex-col gap-1.5 mt-0.5 mb-1">
-              <div className="flex items-center justify-between text-xs font-black">
-                <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  <span>{displayCurrent.toLocaleString()} {unitLabel} drunk ({percent}%)</span>
+            return (
+              <div className="w-full px-4 py-2 rounded-2xl bg-white/90 dark:bg-slate-900/90 border border-sky-100/90 dark:border-slate-800 shadow-sm backdrop-blur-md flex flex-col gap-1.5">
+                <div className="flex items-center justify-between text-xs font-black">
+                  <div className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>{displayCurrent.toLocaleString()} {unitLabel} drunk ({percent}%)</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-rose-500 dark:text-rose-400">
+                    <span>{remaining.toLocaleString()} {unitLabel} left</span>
+                    <span className="w-2 h-2 rounded-full bg-rose-500" />
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-rose-500 dark:text-rose-400">
-                  <span>{remaining.toLocaleString()} {unitLabel} left</span>
-                  <span className="w-2 h-2 rounded-full bg-rose-500" />
+
+                {/* Slim Progress Meter Bar */}
+                <div className="w-full h-2 rounded-full bg-rose-200 dark:bg-rose-950/70 overflow-hidden flex shadow-inner">
+                  <div
+                    className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-700 ease-out shadow-xs"
+                    style={{ width: `${percent}%` }}
+                  />
                 </div>
               </div>
-
-              {/* Slim Progress Meter Bar */}
-              <div className="w-full h-2 rounded-full bg-rose-200 dark:bg-rose-950/70 overflow-hidden flex shadow-inner">
-                <div
-                  className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full transition-all duration-700 ease-out shadow-xs"
-                  style={{ width: `${percent}%` }}
-                />
-              </div>
-            </div>
-          );
-        })()}
+            );
+          })()}
+        </div>
       </main>
 
       {/* Undo Toast */}

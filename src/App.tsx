@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { App as CapacitorApp } from '@capacitor/app';
 import { useTheme } from './hooks/useTheme';
 import { useWaterLog } from './hooks/useWaterLog';
@@ -14,9 +14,13 @@ import { InAppNotificationBanner } from './components/common/InAppNotificationBa
 import { storage } from './lib/storage';
 import { haptic } from './lib/haptics';
 
+const TABS: TabType[] = ['home', 'history', 'reminders', 'settings'];
+
 export function App() {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [subPage, setSubPage] = useState<'none' | 'notification_settings'>('none');
+  const touchStartX = useRef<number | null>(null);
+  const touchStartY = useRef<number | null>(null);
 
   useTheme();
   const {
@@ -45,6 +49,37 @@ export function App() {
   } = useNotifications(settings, stats.todayTotalMl, (amount) => {
     addWater(amount);
   });
+
+  // 1-Finger horizontal swipe gesture handler
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (subPage !== 'none') return;
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartX.current === null || touchStartY.current === null || subPage !== 'none') return;
+
+    const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+    const deltaY = e.changedTouches[0].clientY - touchStartY.current;
+
+    // Minimum swipe threshold of 50px and horizontal dominance (at least 1.3x vertical)
+    if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY) * 1.3) {
+      const currentIndex = TABS.indexOf(activeTab);
+      if (deltaX < 0 && currentIndex < TABS.length - 1) {
+        // Swiped Left -> Move to Next Tab
+        haptic.tap();
+        setActiveTab(TABS[currentIndex + 1]);
+      } else if (deltaX > 0 && currentIndex > 0) {
+        // Swiped Right -> Move to Previous Tab
+        haptic.tap();
+        setActiveTab(TABS[currentIndex - 1]);
+      }
+    }
+
+    touchStartX.current = null;
+    touchStartY.current = null;
+  };
 
   // Hardware Back Button listener for Android
   useEffect(() => {
@@ -99,65 +134,69 @@ export function App() {
   }
 
   return (
-    <div className="h-screen h-[100dvh] bg-background text-foreground flex flex-col max-w-md mx-auto relative overflow-hidden transition-colors duration-200">
+    <div
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
+      className="h-screen h-[100dvh] bg-background text-foreground flex flex-col max-w-md md:max-w-xl lg:max-w-2xl mx-auto relative overflow-hidden transition-colors duration-200 select-none"
+    >
       {/* Scrollable Main Area */}
-      <div className="flex-1 overflow-y-auto overscroll-y-contain">
+      <div className="flex-1 flex flex-col overflow-y-auto overscroll-y-contain min-h-0">
         {/* Subpage or Primary Tabs */}
         {subPage === 'notification_settings' ? (
-        <NotificationSettingsPage
-          userSettings={settings}
-          notifSettings={notifSettings}
-          onUpdateNotifSettings={updateNotifSettings}
-          onBack={() => setSubPage('none')}
-          onTestNotification={testNotification}
-        />
-      ) : (
-        <>
-          {activeTab === 'home' && (
-            <HomePage
-              stats={stats}
-              settings={settings}
-              onAddWater={addWater}
-              undoEntry={undoEntry}
-              onUndoLastAdd={undoLastAdd}
-              onNavigateToReminders={() => setActiveTab('reminders')}
-            />
-          )}
+          <NotificationSettingsPage
+            userSettings={settings}
+            notifSettings={notifSettings}
+            onUpdateNotifSettings={updateNotifSettings}
+            onBack={() => setSubPage('none')}
+            onTestNotification={testNotification}
+          />
+        ) : (
+          <div key={activeTab} className="flex-1 flex flex-col min-h-full animate-fade-in">
+            {activeTab === 'home' && (
+              <HomePage
+                stats={stats}
+                settings={settings}
+                onAddWater={addWater}
+                undoEntry={undoEntry}
+                onUndoLastAdd={undoLastAdd}
+                onNavigateToReminders={() => setActiveTab('reminders')}
+              />
+            )}
 
-          {activeTab === 'history' && (
-            <HistoryPage
-              stats={stats}
-              allLogs={allLogs}
-              todayLog={todayLog}
-              settings={settings}
-              onRemoveEntry={removeEntry}
-            />
-          )}
+            {activeTab === 'history' && (
+              <HistoryPage
+                stats={stats}
+                allLogs={allLogs}
+                todayLog={todayLog}
+                settings={settings}
+                onRemoveEntry={removeEntry}
+              />
+            )}
 
-          {activeTab === 'reminders' && (
-            <RemindersPage
-              userSettings={settings}
-              notifSettings={notifSettings}
-              activeSlots={activeSlots}
-              todayTotalMl={stats.todayTotalMl}
-              onUpdateUserSettings={updateSettings}
-              onToggleMasterSwitch={toggleMasterSwitch}
-              onToggleSlotActive={toggleSlotActive}
-            />
-          )}
+            {activeTab === 'reminders' && (
+              <RemindersPage
+                userSettings={settings}
+                notifSettings={notifSettings}
+                activeSlots={activeSlots}
+                todayTotalMl={stats.todayTotalMl}
+                onUpdateUserSettings={updateSettings}
+                onToggleMasterSwitch={toggleMasterSwitch}
+                onToggleSlotActive={toggleSlotActive}
+              />
+            )}
 
-          {activeTab === 'settings' && (
-            <SettingsPage
-              settings={settings}
-              notifSettings={notifSettings}
-              onUpdateSettings={updateSettings}
-              onUpdateNotifSettings={updateNotifSettings}
-              onTestNotification={testNotification}
-              onClearAllData={handleClearAllData}
-            />
-          )}
-        </>
-      )}
+            {activeTab === 'settings' && (
+              <SettingsPage
+                settings={settings}
+                notifSettings={notifSettings}
+                onUpdateSettings={updateSettings}
+                onUpdateNotifSettings={updateNotifSettings}
+                onTestNotification={testNotification}
+                onClearAllData={handleClearAllData}
+              />
+            )}
+          </div>
+        )}
       </div>
 
       {/* Global In-App Notification Banner */}

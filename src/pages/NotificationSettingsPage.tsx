@@ -30,7 +30,8 @@ export const NotificationSettingsPage: React.FC<NotificationSettingsPageProps> =
   onTestNotification,
 }) => {
   const soundTones: { id: SoundTone; label: string }[] = [
-    { id: 'voice_announcement', label: 'Voice Alert (Name) 🗣️' },
+    { id: 'voice_announcement', label: 'Indian Girl 👧' },
+    { id: 'voice_hindi', label: 'Hindi Voice 🌸' },
     { id: 'water_drop', label: 'Water Drop 💧' },
     { id: 'gentle_chime', label: 'Gentle Chime 🔔' },
     { id: 'soft_bell', label: 'Soft Bell 🎵' },
@@ -100,14 +101,14 @@ export const NotificationSettingsPage: React.FC<NotificationSettingsPageProps> =
                 <button
                   key={item.id}
                   onClick={() => handleToneSelect(item.id)}
-                  className={`flex items-center justify-between p-3 rounded-2xl border text-left transition-all ${
+                  className={`flex items-center justify-between px-3 py-3 rounded-2xl border text-left transition-all min-h-[46px] ${
                     notifSettings.soundTone === item.id
                       ? 'border-accent bg-accent/5 ring-1 ring-accent text-foreground font-bold'
                       : 'border-surface-border bg-surface-subtle/50 text-muted-foreground hover:bg-surface-subtle'
                   }`}
                 >
-                  <span className="text-xs">{item.label}</span>
-                  <Play className="w-3 h-3 opacity-60" />
+                  <span className="text-xs font-medium truncate mr-1">{item.label}</span>
+                  <Play className="w-3 h-3 opacity-60 shrink-0" />
                 </button>
               ))}
             </div>

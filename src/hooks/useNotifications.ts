@@ -1,11 +1,11 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { LocalNotifications, ActionPerformed } from '@capacitor/local-notifications';
 import { NotificationSettings, ReminderSlot, SoundTone, UserSettings } from '../types';
 import { ACTION_IDS, DEFAULT_NOTIFICATION_SETTINGS, STORAGE_KEYS } from '../lib/constants';
 import { storage } from '../lib/storage';
 import { notificationService } from '../lib/notifications';
 import { buildSchedule } from '../lib/schedule';
-import { playTone, speakNotification } from '../lib/sound';
+import { playTone, stopAllAudio } from '../lib/sound';
 import { haptic } from '../lib/haptics';
 import { InAppNotificationData } from '../components/common/InAppNotificationBanner';
 
@@ -19,6 +19,8 @@ export function useNotifications(
   const [customSlots, setCustomSlots] = useState<ReminderSlot[]>([]);
   const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [inAppBanner, setInAppBanner] = useState<InAppNotificationData | null>(null);
+
+  const lastAlertTimeRef = useRef<number>(0);
 
   // Load notification settings from storage
   useEffect(() => {
@@ -58,7 +60,13 @@ export function useNotifications(
 
   // Trigger in-app notification banner & sound
   const showNotificationAlert = useCallback(
-    async (title: string, body: string, amountMl: number, tone?: SoundTone) => {
+    async (
+      title: string,
+      body: string,
+      amountMl: number,
+      tone?: SoundTone,
+      skipSound: boolean = false
+    ) => {
       const selectedTone = tone || notifSettings.soundTone;
       const userName = userSettings.userName;
 
@@ -70,13 +78,15 @@ export function useNotifications(
         amountMl,
       });
 
-      // Play audio & haptics
+      if (skipSound) return;
+
+      lastAlertTimeRef.current = Date.now();
+
+      // Stop any prior overlapping audio & play audio/haptics cleanly
+      stopAllAudio();
+
       if (notifSettings.alertType === 'sound' || notifSettings.alertType === 'both') {
-        if (selectedTone === 'voice_announcement' || notifSettings.voiceAnnouncement) {
-          await speakNotification(userName, amountMl);
-        } else {
-          await playTone(selectedTone, userName, amountMl);
-        }
+        await playTone(selectedTone, userName, amountMl);
       }
       if (notifSettings.alertType === 'buzz' || notifSettings.alertType === 'both') {
         haptic.buzzPattern();
@@ -108,11 +118,16 @@ export function useNotifications(
       const tone = (extra?.tone as SoundTone) || notifSettings.soundTone;
       const amount = extra?.amountMl || userSettings.defaultCupMl || 250;
 
+      // If an alert was already triggered within the last 4 seconds, don't duplicate sound
+      const timeSinceLastAlert = Date.now() - lastAlertTimeRef.current;
+      const shouldSkipSound = timeSinceLastAlert < 4000;
+
       await showNotificationAlert(
         notification.title || 'Hydration Reminder 💧',
         notification.body || `Time to drink ${amount} ml of water!`,
         amount,
-        tone
+        tone,
+        shouldSkipSound
       );
     }).then((handle) => {
       receivedHandle = handle;
@@ -138,14 +153,15 @@ export function useNotifications(
       const now = new Date();
       const hh = String(now.getHours()).padStart(2, '0');
       const mm = String(now.getMinutes()).padStart(2, '0');
-      const currentTimeStr = `${hh}:${mm}`;
+      const currentSlotStr = `${hh}:${mm}`;
 
-      if (lastFiredTimeStr === currentTimeStr) return;
+      if (currentSlotStr === lastFiredTimeStr) return;
 
-      const matchingSlot = activeSlots.find((s) => s.active && s.timeStr === currentTimeStr);
+      const matchingSlot = activeSlots.find((s) => s.active && s.timeStr === currentSlotStr);
       if (matchingSlot) {
-        lastFiredTimeStr = currentTimeStr;
+        lastFiredTimeStr = currentSlotStr;
 
+        // Check if user already reached goal and stopWhenGoalReached is enabled
         if (notifSettings.stopWhenGoalReached && todayCurrentMl >= userSettings.dailyGoalMl) {
           return;
         }
@@ -209,7 +225,6 @@ export function useNotifications(
         if (granted) {
           await updateNotifSettings({ enabled: true });
         } else {
-          // If denied, keep it off
           await updateNotifSettings({ enabled: false });
         }
       } else {
@@ -243,7 +258,7 @@ export function useNotifications(
     // 1. Trigger in-app banner & audio immediately
     await showNotificationAlert(title, body, cupAmount, notifSettings.soundTone);
 
-    // 2. Trigger native system notification
+    // 2. Trigger native system notification without duplicate audio in JS
     await notificationService.triggerTestNotification(
       { ...userSettings, defaultCupMl: cupAmount },
       notifSettings,

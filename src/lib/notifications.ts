@@ -11,8 +11,6 @@ import {
   NOTIFICATION_CHANNELS,
 } from './constants';
 import { AlertType, MessageStyle, NotificationSettings, ReminderSlot, SoundTone, UserSettings } from '../types';
-import { playTone, speakNotification } from './sound';
-import { haptic } from './haptics';
 
 export const notificationService = {
   /**
@@ -24,7 +22,7 @@ export const notificationService = {
       const existing = await LocalNotifications.listChannels().catch(() => ({ channels: [] }));
       if (existing && existing.channels) {
         for (const ch of existing.channels) {
-          if (ch.id.startsWith('drinkup_') && !ch.id.includes('_v4')) {
+          if (ch.id.startsWith('drinkup_') && !ch.id.includes('_v6')) {
             await LocalNotifications.deleteChannel({ id: ch.id }).catch(() => {});
           }
         }
@@ -32,6 +30,54 @@ export const notificationService = {
 
       // 2. Create channels for Android with sound & vibration
       const channels: Channel[] = [
+        // Indian Girl Voice Channels (MAX importance for Screen Off / Lockscreen alerts)
+        {
+          id: NOTIFICATION_CHANNELS.BOTH_INDIAN_GIRL,
+          name: 'Indian Girl Voice (Sound & Vibration)',
+          description: 'Hydration reminders with Indian girl voice alert and vibration',
+          importance: 5,
+          visibility: 1,
+          sound: 'indian_girl_voice.wav',
+          vibration: true,
+          lights: true,
+          lightColor: '#00BCD4',
+        },
+        {
+          id: NOTIFICATION_CHANNELS.SOUND_INDIAN_GIRL,
+          name: 'Indian Girl Voice (Sound Only)',
+          description: 'Hydration reminders with Indian girl voice alert',
+          importance: 5,
+          visibility: 1,
+          sound: 'indian_girl_voice.wav',
+          vibration: false,
+          lights: true,
+          lightColor: '#00BCD4',
+        },
+
+        // Hindi Voice Channels
+        {
+          id: NOTIFICATION_CHANNELS.BOTH_HINDI_GIRL,
+          name: 'Hindi Voice (Sound & Vibration)',
+          description: 'Hydration reminders with sweet Hindi voice and vibration',
+          importance: 5,
+          visibility: 1,
+          sound: 'hindi_girl_voice.wav',
+          vibration: true,
+          lights: true,
+          lightColor: '#FF9800',
+        },
+        {
+          id: NOTIFICATION_CHANNELS.SOUND_HINDI_GIRL,
+          name: 'Hindi Voice (Sound Only)',
+          description: 'Hydration reminders with sweet Hindi voice',
+          importance: 5,
+          visibility: 1,
+          sound: 'hindi_girl_voice.wav',
+          vibration: false,
+          lights: true,
+          lightColor: '#FF9800',
+        },
+
         // Sound & Vibration Channels (Default: MAX importance)
         {
           id: NOTIFICATION_CHANNELS.BOTH_WATER_DROP,
@@ -230,6 +276,10 @@ export const notificationService = {
 
     const isBoth = type === 'both';
     switch (tone) {
+      case 'voice_announcement':
+        return isBoth ? NOTIFICATION_CHANNELS.BOTH_INDIAN_GIRL : NOTIFICATION_CHANNELS.SOUND_INDIAN_GIRL;
+      case 'voice_hindi':
+        return isBoth ? NOTIFICATION_CHANNELS.BOTH_HINDI_GIRL : NOTIFICATION_CHANNELS.SOUND_HINDI_GIRL;
       case 'water_drop':
         return isBoth ? NOTIFICATION_CHANNELS.BOTH_WATER_DROP : NOTIFICATION_CHANNELS.SOUND_WATER_DROP;
       case 'gentle_chime':
@@ -238,15 +288,18 @@ export const notificationService = {
         return isBoth ? NOTIFICATION_CHANNELS.BOTH_SOFT_BELL : NOTIFICATION_CHANNELS.SOUND_SOFT_BELL;
       case 'crystal_ping':
         return isBoth ? NOTIFICATION_CHANNELS.BOTH_CRYSTAL_PING : NOTIFICATION_CHANNELS.SOUND_CRYSTAL_PING;
-      case 'voice_announcement':
       default:
-        return isBoth ? NOTIFICATION_CHANNELS.BOTH_WATER_DROP : NOTIFICATION_CHANNELS.SOUND_WATER_DROP;
+        return isBoth ? NOTIFICATION_CHANNELS.BOTH_INDIAN_GIRL : NOTIFICATION_CHANNELS.SOUND_INDIAN_GIRL;
     }
   },
 
   getSoundFileName(type: AlertType, tone: SoundTone = 'water_drop'): string | undefined {
     if (type === 'silent' || type === 'buzz') return undefined;
     switch (tone) {
+      case 'voice_announcement':
+        return 'indian_girl_voice.wav';
+      case 'voice_hindi':
+        return 'hindi_girl_voice.wav';
       case 'water_drop':
         return 'water_drop.wav';
       case 'gentle_chime':
@@ -255,9 +308,8 @@ export const notificationService = {
         return 'soft_bell.wav';
       case 'crystal_ping':
         return 'crystal_ping.wav';
-      case 'voice_announcement':
       default:
-        return 'water_drop.wav';
+        return 'indian_girl_voice.wav';
     }
   },
 
@@ -390,18 +442,6 @@ export const notificationService = {
       userSettings.userName
     );
 
-    // Audio & voice speech & haptic in-app preview
-    if (notifSettings.alertType === 'sound' || notifSettings.alertType === 'both') {
-      if (notifSettings.soundTone === 'voice_announcement' || notifSettings.voiceAnnouncement) {
-        await speakNotification(userSettings.userName, userSettings.defaultCupMl);
-      } else {
-        await playTone(notifSettings.soundTone, userSettings.userName, userSettings.defaultCupMl);
-      }
-    }
-    if (notifSettings.alertType === 'buzz' || notifSettings.alertType === 'both') {
-      haptic.buzzPattern();
-    }
-
     try {
       const hasPerm = await this.hasPermission();
       if (hasPerm) {
@@ -417,7 +457,7 @@ export const notificationService = {
               largeIcon: 'ic_launcher',
               actionTypeId: notifSettings.actionButtons ? ACTION_TYPES.HYDRATION_ACTION : undefined,
               schedule: { at: new Date(Date.now() + 500) },
-              extra: { amountMl: userSettings.defaultCupMl },
+              extra: { amountMl: userSettings.defaultCupMl, tone: notifSettings.soundTone },
             },
           ],
         };
