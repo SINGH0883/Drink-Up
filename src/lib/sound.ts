@@ -85,8 +85,7 @@ function getWebSpeechVoices(): Promise<SpeechSynthesisVoice[]> {
 }
 
 /**
- * Speaks a pleasant, sweet hydration reminder in Indian Girl / Female voice announcing user's name.
- * Uses exact Web Speech API first (same as web localhost).
+ * Speaks a pleasant, sweet hydration reminder in Indian Girl / Female voice.
  */
 export async function speakNotification(userName?: string, amountMl?: number): Promise<void> {
   stopAllAudio();
@@ -95,80 +94,70 @@ export async function speakNotification(userName?: string, amountMl?: number): P
     userName && userName.trim() && userName.trim().toLowerCase() !== 'friend'
       ? userName.trim()
       : '';
+
   const greeting = cleanName ? `Hello ${cleanName}!` : 'Hello!';
   const amountText = amountMl
-    ? ` Please drink ${amountMl} ml of water.`
-    : ' Please drink a glass of fresh water.';
-  const text = `${greeting} It is time to drink water.${amountText} Stay fresh, hydrated and healthy!`;
+    ? ` Please drink ${amountMl} ml of fresh water`
+    : ' Please drink a glass of fresh water';
+  const text = `${greeting} It's time to drink water.${amountText} and stay healthy and hydrated!`;
 
-  // 1. EXACT Web Speech API (Direct web localhost implementation)
+  // 1. Dynamic Neural Indian Female Voice via endpoint (Plays exact user name + ml amount with Neerja Neural voice)
+  try {
+    const ttsUrl = `/api/tts?text=${encodeURIComponent(text)}`;
+    const res = await fetch(ttsUrl);
+    if (res && res.ok) {
+      const arrayBuffer = await res.arrayBuffer();
+      const ctx = getAudioContext();
+      if (ctx) {
+        const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+        const source = ctx.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(ctx.destination);
+        currentBufferSource = source;
+        source.onended = () => {
+          if (currentBufferSource === source) {
+            currentBufferSource = null;
+          }
+        };
+        source.start(0);
+        return;
+      }
+    }
+  } catch {}
+
+  // 2. Pre-recorded studio Indian Girl audio file fallback (when offline or no custom name)
+  if (!cleanName) {
+    const played = await playAudioFile('indian_girl_voice');
+    if (played) return;
+  }
+
+  // 3. Web Speech API Fallback (with Indian Female Voice selection)
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     try {
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.90;
-      utterance.pitch = 1.25;
+      utterance.rate = 0.95;
+      utterance.pitch = 1.06;
       utterance.volume = 1.0;
 
       const voices = await getWebSpeechVoices();
       if (voices.length > 0) {
-        const indianFemaleKeywords = [
+        const topFemaleKeywords = [
           'neerja',
-          'heera',
           'swara',
-          'aditi',
-          'kangana',
-          'veena',
           'ananya',
-          'deepa',
-          'geeta',
+          'aditi',
+          'vidya',
           'en-in',
           'hi-in',
           'india',
-          'hindi',
-        ];
-        const generalFemaleKeywords = [
           'female',
-          'woman',
-          'girl',
-          'zira',
-          'samantha',
-          'karen',
-          'victoria',
-          'jenny',
-          'aria',
-          'google',
         ];
 
         let bestVoice = voices.find((v) => {
           const lower = (v.name + ' ' + v.voiceURI + ' ' + v.lang).toLowerCase();
-          const isIndian =
-            lower.includes('in') ||
-            lower.includes('india') ||
-            v.lang.startsWith('en-in') ||
-            v.lang.startsWith('hi-in');
-          const isFemale =
-            indianFemaleKeywords.some((k) => lower.includes(k)) ||
-            generalFemaleKeywords.some((k) => lower.includes(k));
-          return isIndian && isFemale;
+          return topFemaleKeywords.some((k) => lower.includes(k)) && !lower.includes('male') && !lower.includes('david');
         });
-
-        if (!bestVoice) {
-          bestVoice = voices.find((v) => {
-            const lower = (v.name + ' ' + v.voiceURI + ' ' + v.lang).toLowerCase();
-            return (
-              (lower.includes('in') || lower.includes('india') || v.lang.startsWith('en-in')) &&
-              !lower.includes('male')
-            );
-          });
-        }
-
-        if (!bestVoice) {
-          bestVoice = voices.find((v) => {
-            const lower = (v.name + ' ' + v.voiceURI).toLowerCase();
-            return v.lang.startsWith('en') && (lower.includes('female') || lower.includes('zira'));
-          });
-        }
 
         if (bestVoice) {
           utterance.voice = bestVoice;
@@ -185,85 +174,47 @@ export async function speakNotification(userName?: string, amountMl?: number): P
     } catch {}
   }
 
-  // 2. Native Android TTS Plugin Fallback
+  // 4. Native Android TTS Plugin Fallback
   try {
-    await TextToSpeech.speak({
-      text,
-      lang: 'en-IN',
-      rate: 0.90,
-      pitch: 1.25,
-      volume: 1.0,
-      category: 'playback',
-    });
-    return;
-  } catch {}
+    let selectedVoiceIndex: number | undefined = undefined;
+    let selectedLang = 'en-IN';
 
-  // 3. Fallback to audio file
-  const played = await playAudioFile('indian_girl_voice');
-  if (played) return;
-
-  // 4. Tone fallback
-  await playAudioFile('gentle_chime');
-}
-
-/**
- * Speaks a sweet, polite hydration reminder in pure Hindi (नमस्ते / पानी पीजिए).
- * Uses exact Web Speech API first (same as web localhost).
- */
-export async function speakHindiNotification(userName?: string, amountMl?: number): Promise<void> {
-  stopAllAudio();
-
-  const cleanName =
-    userName && userName.trim() && userName.trim().toLowerCase() !== 'friend'
-      ? userName.trim()
-      : '';
-  const greeting = cleanName ? `नमस्ते ${cleanName} जी!` : 'नमस्ते!';
-  const amountText = amountMl
-    ? ` कृपया ${amountMl} मिलीलीटर पानी पी लीजिए।`
-    : ' कृपया एक गिलास ताज़ा पानी पी लीजिए।';
-  const text = `${greeting} पानी पीने का समय हो गया है।${amountText} स्वस्थ और तरोताज़ा रहें।`;
-
-  // 1. EXACT Web Speech API (Direct web localhost implementation)
-  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     try {
-      window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 0.88;
-      utterance.pitch = 1.25;
-      utterance.volume = 1.0;
-      utterance.lang = 'hi-IN';
+      const supported = await TextToSpeech.getSupportedVoices();
+      if (supported && supported.voices && supported.voices.length > 0) {
+        const indianFemaleIndex = supported.voices.findIndex((v) => {
+          const lower = (v.name + ' ' + v.voiceURI + ' ' + v.lang).toLowerCase();
+          return (
+            (lower.includes('in') || lower.includes('india') || v.lang.startsWith('en-in') || v.lang.startsWith('hi-in')) &&
+            (lower.includes('female') ||
+              lower.includes('neerja') ||
+              lower.includes('ananya') ||
+              lower.includes('heera') ||
+              lower.includes('swara') ||
+              lower.includes('aditi'))
+          );
+        });
 
-      const voices = await getWebSpeechVoices();
-      const hindiVoice = voices.find(
-        (v) =>
-          (v.lang && (v.lang.startsWith('hi') || v.lang.includes('IN'))) ||
-          v.name.toLowerCase().includes('hindi')
-      );
-      if (hindiVoice) {
-        utterance.voice = hindiVoice;
+        if (indianFemaleIndex !== -1) {
+          selectedVoiceIndex = indianFemaleIndex;
+          selectedLang = supported.voices[indianFemaleIndex].lang || 'en-IN';
+        }
       }
-      window.speechSynthesis.speak(utterance);
-      return;
     } catch {}
-  }
 
-  // 2. Native Android TTS Plugin Fallback
-  try {
     await TextToSpeech.speak({
       text,
-      lang: 'hi-IN',
-      rate: 0.88,
-      pitch: 1.25,
+      lang: selectedLang,
+      rate: 0.94,
+      pitch: 1.12,
       volume: 1.0,
+      voice: selectedVoiceIndex,
       category: 'playback',
     });
     return;
   } catch {}
 
-  // 3. Fallback to audio file
-  const played = await playAudioFile('hindi_girl_voice');
-  if (played) return;
-
+  // 5. Fallback tone
   await playAudioFile('gentle_chime');
 }
 
@@ -275,19 +226,24 @@ async function playAudioFile(toneName: string): Promise<boolean> {
 
   stopAllAudio();
 
-  // Strategy 1: Web Audio API fetch & decode
+  const cacheBuster = `?t=${Date.now()}`;
+
+  // Strategy 1: Web Audio API fetch & decode (Supports .wav and .mp3)
   try {
     const ctx = getAudioContext();
     if (ctx) {
       const candidates = [
-        `/sounds/${toneName}.wav`,
-        `sounds/${toneName}.wav`,
-        new URL(`sounds/${toneName}.wav`, window.location.href).href,
+        `/sounds/${toneName}.mp3${cacheBuster}`,
+        `sounds/${toneName}.mp3${cacheBuster}`,
+        `/sounds/${toneName}.wav${cacheBuster}`,
+        `sounds/${toneName}.wav${cacheBuster}`,
+        new URL(`sounds/${toneName}.mp3${cacheBuster}`, window.location.href).href,
+        new URL(`sounds/${toneName}.wav${cacheBuster}`, window.location.href).href,
       ];
 
       for (const url of candidates) {
         try {
-          const res = await fetch(url);
+          const res = await fetch(url, { cache: 'no-store' });
           if (res && res.ok) {
             const arrayBuffer = await res.arrayBuffer();
             const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
@@ -310,9 +266,11 @@ async function playAudioFile(toneName: string): Promise<boolean> {
 
   // Strategy 2: HTML5 Audio Element
   const candidateUrls = [
-    `sounds/${toneName}.wav`,
-    `/sounds/${toneName}.wav`,
-    new URL(`sounds/${toneName}.wav`, window.location.href).href,
+    `/sounds/${toneName}.mp3${cacheBuster}`,
+    `sounds/${toneName}.mp3${cacheBuster}`,
+    `/sounds/${toneName}.wav${cacheBuster}`,
+    `sounds/${toneName}.wav${cacheBuster}`,
+    new URL(`sounds/${toneName}.mp3${cacheBuster}`, window.location.href).href,
   ];
 
   for (const url of candidateUrls) {
@@ -334,12 +292,39 @@ async function playAudioFile(toneName: string): Promise<boolean> {
 }
 
 /**
+ * Plays custom uploaded user audio data
+ */
+export async function playCustomAudio(customDataUrl?: string): Promise<boolean> {
+  stopAllAudio();
+  const data =
+    customDataUrl ||
+    (typeof window !== 'undefined' ? localStorage.getItem('drinkup_custom_audio') : null);
+
+  if (!data) return false;
+
+  try {
+    const audio = new Audio(data);
+    audio.volume = 1.0;
+    currentAudio = audio;
+    audio.onended = () => {
+      if (currentAudio === audio) currentAudio = null;
+    };
+    await audio.play();
+    return true;
+  } catch (err) {
+    console.warn('Failed to play custom audio:', err);
+    return false;
+  }
+}
+
+/**
  * Plays soothing water tones or speaks voice reminder cleanly.
  */
 export async function playTone(
   tone: SoundTone,
   userName?: string,
-  amountMl?: number
+  amountMl?: number,
+  customSoundData?: string
 ): Promise<void> {
   stopAllAudio();
 
@@ -348,8 +333,10 @@ export async function playTone(
     return;
   }
 
-  if (tone === 'voice_hindi') {
-    await speakHindiNotification(userName, amountMl);
+  if (tone === 'custom') {
+    const playedCustom = await playCustomAudio(customSoundData);
+    if (playedCustom) return;
+    await playAudioFile('gentle_chime');
     return;
   }
 

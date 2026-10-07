@@ -17,8 +17,8 @@ export const WaterRing: React.FC<WaterRingProps> = ({
   unit,
   onRingClick,
 }) => {
-  const size = 260;
-  const strokeWidth = 14;
+  const size = 236;
+  const strokeWidth = 13;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
 

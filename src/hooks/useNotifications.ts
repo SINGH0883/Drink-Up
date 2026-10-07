@@ -86,7 +86,7 @@ export function useNotifications(
       stopAllAudio();
 
       if (notifSettings.alertType === 'sound' || notifSettings.alertType === 'both') {
-        await playTone(selectedTone, userName, amountMl);
+        await playTone(selectedTone, userName, amountMl, notifSettings.customSoundData);
       }
       if (notifSettings.alertType === 'buzz' || notifSettings.alertType === 'both') {
         haptic.buzzPattern();

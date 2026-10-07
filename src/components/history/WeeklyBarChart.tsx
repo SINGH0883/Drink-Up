@@ -41,14 +41,14 @@ export const WeeklyBarChart: React.FC<WeeklyBarChartProps> = ({
     };
   });
 
-  const chartHeight = 140;
+  const chartHeight = 100;
 
   return (
-    <div className="p-5 rounded-3xl bg-surface border border-surface-border shadow-sm mb-5">
-      <div className="flex items-center justify-between mb-4">
+    <div className="p-3.5 rounded-2xl bg-surface border border-surface-border shadow-2xs">
+      <div className="flex items-center justify-between mb-2.5">
         <div>
-          <h3 className="text-sm font-bold text-foreground">Last 7 Days</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">Hydration consistency</p>
+          <h3 className="text-xs font-bold text-foreground">Last 7 Days</h3>
+          <p className="text-[10px] text-muted-foreground mt-0.5">Hydration consistency</p>
         </div>
         <div className="flex items-center gap-3 text-xs">
           <div className="flex items-center gap-1.5">
@@ -62,7 +62,7 @@ export const WeeklyBarChart: React.FC<WeeklyBarChartProps> = ({
         </div>
       </div>
 
-      <div className="flex items-end justify-between gap-2 h-44 pt-4 pb-2 px-1">
+      <div className="flex items-end justify-between gap-1.5 h-34 pt-2 pb-1 px-1">
         {days.map((day) => {
           const barHeightPx = Math.max(8, Math.round((day.percent / 100) * chartHeight));
           const displayAmount =
@@ -72,13 +72,13 @@ export const WeeklyBarChart: React.FC<WeeklyBarChartProps> = ({
 
           return (
             <div key={day.key} className="flex-1 flex flex-col items-center h-full justify-end group">
-              {/* Tooltip on hover */}
-              <span className="text-[10px] font-semibold text-muted-foreground mb-1 group-hover:text-foreground transition-colors">
+              {/* Value label */}
+              <span className="text-[10px] font-bold text-muted-foreground mb-1 group-hover:text-foreground transition-colors">
                 {day.totalMl > 0 ? displayAmount : '-'}
               </span>
 
               {/* Bar container */}
-              <div className="w-full max-w-[28px] h-[140px] bg-surface-subtle rounded-xl flex flex-col justify-end p-1 relative overflow-hidden">
+              <div className="w-full max-w-[24px] h-[100px] bg-surface-subtle rounded-xl flex flex-col justify-end p-0.5 relative overflow-hidden">
                 {/* 100% Target Reference Line */}
                 <div className="absolute top-0 left-0 right-0 border-t border-dashed border-muted-foreground/30 z-10" />
 
@@ -86,7 +86,7 @@ export const WeeklyBarChart: React.FC<WeeklyBarChartProps> = ({
                   style={{ height: `${barHeightPx}px` }}
                   className={`w-full rounded-lg transition-all duration-500 ${
                     day.isCompleted
-                      ? 'bg-gradient-to-t from-emerald-500 to-teal-400 shadow-[0_0_10px_rgba(16,185,129,0.3)]'
+                      ? 'bg-gradient-to-t from-emerald-500 to-teal-400 shadow-[0_0_8px_rgba(16,185,129,0.3)]'
                       : day.percent > 0
                       ? 'bg-gradient-to-t from-accent to-sky-400'
                       : 'bg-transparent'
@@ -95,15 +95,15 @@ export const WeeklyBarChart: React.FC<WeeklyBarChartProps> = ({
               </div>
 
               {/* Day Label */}
-              <div className="flex flex-col items-center mt-2">
+              <div className="flex flex-col items-center mt-1.5">
                 <span
                   className={`text-[11px] font-bold ${
-                    day.isToday ? 'text-accent font-extrabold' : 'text-foreground'
+                    day.isToday ? 'text-accent font-black' : 'text-foreground'
                   }`}
                 >
                   {day.dayName}
                 </span>
-                <span className="text-[10px] text-muted-foreground">{day.dayNumber}</span>
+                <span className="text-[10px] text-muted-foreground leading-none mt-0.5">{day.dayNumber}</span>
               </div>
             </div>
           );

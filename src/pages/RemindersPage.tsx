@@ -1,7 +1,6 @@
 import React from 'react';
 import {
   Bell,
-  Sparkles,
   Clock,
   Coffee,
   CalendarCheck,
@@ -40,29 +39,29 @@ export const RemindersPage: React.FC<RemindersPageProps> = ({
   });
 
   return (
-    <div className="flex flex-col min-h-full pb-8">
+    <div className="flex-1 flex flex-col h-full min-h-0 overflow-hidden pb-1">
       <Header
         title="Reminders"
         subtitle="Smart Hydration Timetable"
       />
 
-      <main className="flex-1 px-4 py-2 max-w-md mx-auto w-full space-y-4">
+      <main className="flex-1 px-3.5 pt-1 pb-2 max-w-md mx-auto w-full flex flex-col gap-2.5 min-h-0">
         {/* Master Reminder Card */}
-        <div className="p-5 rounded-3xl bg-surface border border-surface-border shadow-sm">
+        <div className="p-3.5 rounded-2xl bg-surface border border-surface-border shadow-2xs space-y-2.5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2.5">
               <div
-                className={`w-11 h-11 rounded-2xl flex items-center justify-center ${
+                className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 ${
                   notifSettings.enabled
                     ? 'bg-accent/15 text-accent dark:bg-accent/20'
                     : 'bg-surface-subtle text-muted-foreground'
                 }`}
               >
-                <Bell className="w-5 h-5 stroke-[2.2]" />
+                <Bell className="w-4 h-4 stroke-[2.2]" />
               </div>
               <div>
-                <h2 className="text-base font-bold text-foreground">Hydration Reminders</h2>
-                <p className="text-xs text-muted-foreground mt-0.5">
+                <h2 className="text-sm font-bold text-foreground leading-tight">Hydration Reminders</h2>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
                   {notifSettings.enabled ? 'Active throughout the day' : 'All reminders paused'}
                 </p>
               </div>
@@ -72,52 +71,29 @@ export const RemindersPage: React.FC<RemindersPageProps> = ({
 
           {/* Quick Schedule Parameters */}
           {notifSettings.enabled && (
-            <div className="mt-5 pt-4 border-t border-surface-border space-y-4">
-              {/* Auto Schedule Switch */}
-              <div className="flex items-center justify-between">
-                <div>
-                  <span className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-                    <Sparkles className="w-3.5 h-3.5 text-accent" />
-                    <span>Auto Schedule Timetable</span>
-                  </span>
-                  <p className="text-[11px] text-muted-foreground mt-0.5">
-                    Evenly spaces reminders from your target goal & cup size
-                  </p>
+            <div className="pt-2 border-t border-surface-border space-y-2.5">
+              {/* Live Timetable Summary Card */}
+              <div className="p-2 rounded-xl bg-accent-subtle/70 border border-accent/20 flex items-center justify-between text-[11px]">
+                <div className="flex items-center gap-2 min-w-0">
+                  <CalendarCheck className="w-3.5 h-3.5 text-accent shrink-0" />
+                  <div className="truncate">
+                    <span className="font-bold text-foreground">
+                      {scheduleSummary.drinksCount} drinks ({scheduleSummary.perDrinkMl}ml each)
+                    </span>
+                    <p className="text-[10px] text-muted-foreground">
+                      {scheduleSummary.firstDrinkTime} → {scheduleSummary.lastDrinkTime}
+                    </p>
+                  </div>
                 </div>
-                <Switch
-                  checked={userSettings.autoSchedule}
-                  onChange={(val) => {
-                    haptic.tap();
-                    onUpdateUserSettings({ autoSchedule: val });
-                  }}
-                  id="auto-schedule-switch"
-                />
+                <span className="px-2 py-0.5 rounded-lg bg-accent text-white font-bold text-[10px] shadow-2xs shrink-0">
+                  Every {scheduleSummary.intervalFormatted}
+                </span>
               </div>
 
-              {/* Live Timetable Summary Card */}
-              {userSettings.autoSchedule && (
-                <div className="p-3.5 rounded-2xl bg-accent-subtle/60 border border-accent/20 flex items-center justify-between text-xs">
-                  <div className="flex items-center gap-2">
-                    <CalendarCheck className="w-4 h-4 text-accent" />
-                    <div>
-                      <span className="font-bold text-foreground">
-                        {scheduleSummary.drinksCount} drinks ({scheduleSummary.perDrinkMl}ml each)
-                      </span>
-                      <p className="text-[11px] text-muted-foreground mt-0.5">
-                        {scheduleSummary.firstDrinkTime} → {scheduleSummary.lastDrinkTime}
-                      </p>
-                    </div>
-                  </div>
-                  <span className="px-2.5 py-1 rounded-xl bg-accent text-white font-bold text-[11px] shadow-sm">
-                    Every {scheduleSummary.intervalFormatted}
-                  </span>
-                </div>
-              )}
-
               {/* Wake & Sleep Window */}
-              <div className="grid grid-cols-2 gap-3 pt-1">
-                <div className="p-3 rounded-2xl bg-surface-subtle/70 border border-surface-border/80">
-                  <label className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="p-2 rounded-xl bg-surface-subtle/80 border border-surface-border">
+                  <label className="text-[10px] font-bold text-muted-foreground flex items-center gap-1">
                     <Clock className="w-3 h-3 text-accent" />
                     <span>Wake Time</span>
                   </label>
@@ -125,12 +101,12 @@ export const RemindersPage: React.FC<RemindersPageProps> = ({
                     type="time"
                     value={userSettings.wakeTime}
                     onChange={(e) => onUpdateUserSettings({ wakeTime: e.target.value })}
-                    className="w-full mt-1 bg-transparent font-bold text-sm text-foreground focus:outline-none cursor-pointer"
+                    className="w-full bg-transparent font-bold text-xs text-foreground focus:outline-none cursor-pointer mt-0.5"
                   />
                 </div>
 
-                <div className="p-3 rounded-2xl bg-surface-subtle/70 border border-surface-border/80">
-                  <label className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1">
+                <div className="p-2 rounded-xl bg-surface-subtle/80 border border-surface-border">
+                  <label className="text-[10px] font-bold text-muted-foreground flex items-center gap-1">
                     <Clock className="w-3 h-3 text-indigo-400" />
                     <span>Sleep Time</span>
                   </label>
@@ -138,18 +114,18 @@ export const RemindersPage: React.FC<RemindersPageProps> = ({
                     type="time"
                     value={userSettings.sleepTime}
                     onChange={(e) => onUpdateUserSettings({ sleepTime: e.target.value })}
-                    className="w-full mt-1 bg-transparent font-bold text-sm text-foreground focus:outline-none cursor-pointer"
+                    className="w-full bg-transparent font-bold text-xs text-foreground focus:outline-none cursor-pointer mt-0.5"
                   />
                 </div>
               </div>
 
               {/* Cup Size Selector */}
-              <div>
-                <label className="text-xs font-semibold text-muted-foreground flex items-center gap-1 mb-2">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[11px] font-semibold text-muted-foreground flex items-center gap-1 shrink-0">
                   <Coffee className="w-3.5 h-3.5 text-accent" />
-                  <span>Target Cup Size (Interval Basis)</span>
-                </label>
-                <div className="grid grid-cols-3 gap-2">
+                  <span>Cup Size</span>
+                </span>
+                <div className="flex gap-1.5">
                   {[150, 250, 500].map((size) => (
                     <button
                       key={size}
@@ -157,10 +133,10 @@ export const RemindersPage: React.FC<RemindersPageProps> = ({
                         haptic.tap();
                         onUpdateUserSettings({ defaultCupMl: size });
                       }}
-                      className={`py-2 px-3 rounded-xl text-xs font-bold border transition-all ${
+                      className={`py-1 px-2.5 rounded-lg text-[11px] font-bold border transition-all ${
                         userSettings.defaultCupMl === size
-                          ? 'bg-accent text-white border-accent shadow-sm'
-                          : 'bg-surface-subtle text-muted-foreground border-surface-border'
+                          ? 'bg-accent text-white border-accent shadow-2xs'
+                          : 'bg-surface-subtle text-muted-foreground border-surface-border hover:bg-surface'
                       }`}
                     >
                       {size} ml
@@ -171,8 +147,6 @@ export const RemindersPage: React.FC<RemindersPageProps> = ({
             </div>
           )}
         </div>
-
-
 
         {/* Schedule Timeline Preview */}
         {notifSettings.enabled && (

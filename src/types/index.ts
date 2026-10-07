@@ -2,7 +2,7 @@ export type ThemeMode = 'system' | 'light' | 'dark';
 
 export type AlertType = 'sound' | 'buzz' | 'both' | 'silent';
 
-export type SoundTone = 'voice_announcement' | 'voice_hindi' | 'water_drop' | 'gentle_chime' | 'soft_bell' | 'crystal_ping';
+export type SoundTone = 'voice_announcement' | 'water_drop' | 'gentle_chime' | 'soft_bell' | 'crystal_ping' | 'custom';
 
 export type MessageStyle = 'friendly' | 'simple' | 'motivational';
 
@@ -41,6 +41,8 @@ export interface NotificationSettings {
   enabled: boolean;
   alertType: AlertType;
   soundTone: SoundTone;
+  customSoundData?: string;
+  customSoundName?: string;
   voiceAnnouncement?: boolean;
   quietHoursEnabled: boolean;
   quietStart: string; // "HH:MM"

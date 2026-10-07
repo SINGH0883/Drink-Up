@@ -46,8 +46,6 @@ export const OZ_TO_ML_RATIO = 29.5735;
 export const NOTIFICATION_CHANNELS = {
   SOUND_INDIAN_GIRL: 'drinkup_sound_indian_girl_v6',
   BOTH_INDIAN_GIRL: 'drinkup_both_indian_girl_v6',
-  SOUND_HINDI_GIRL: 'drinkup_sound_hindi_girl_v6',
-  BOTH_HINDI_GIRL: 'drinkup_both_hindi_girl_v6',
   SOUND_WATER_DROP: 'drinkup_sound_water_drop_v6',
   SOUND_GENTLE_CHIME: 'drinkup_sound_gentle_chime_v6',
   SOUND_SOFT_BELL: 'drinkup_sound_soft_bell_v6',

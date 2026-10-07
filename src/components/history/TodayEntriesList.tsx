@@ -28,41 +28,41 @@ export const TodayEntriesList: React.FC<TodayEntriesListProps> = ({
   };
 
   return (
-    <div className="p-5 rounded-3xl bg-surface border border-surface-border shadow-sm mb-6">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-sm font-bold text-foreground">Today's Logs</h3>
-        <span className="text-xs font-semibold text-muted-foreground">
+    <div className="flex-1 flex flex-col min-h-0 p-3.5 rounded-2xl bg-surface border border-surface-border shadow-2xs">
+      <div className="flex items-center justify-between mb-2 shrink-0">
+        <h3 className="text-xs font-bold text-foreground">Today's Logs</h3>
+        <span className="text-[10px] font-bold text-muted-foreground bg-surface-subtle px-2 py-0.5 rounded-full">
           {entries.length} {entries.length === 1 ? 'drink' : 'drinks'}
         </span>
       </div>
 
       {entries.length === 0 ? (
-        <div className="py-8 text-center">
-          <div className="w-12 h-12 mx-auto rounded-full bg-surface-subtle flex items-center justify-center text-muted-foreground mb-2">
-            <Droplet className="w-6 h-6 opacity-40" />
+        <div className="flex-1 flex flex-col items-center justify-center py-4 text-center">
+          <div className="w-10 h-10 mx-auto rounded-full bg-surface-subtle flex items-center justify-center text-muted-foreground mb-1.5">
+            <Droplet className="w-5 h-5 opacity-40" />
           </div>
-          <p className="text-sm font-medium text-muted-foreground">No drinks logged yet today</p>
-          <p className="text-xs text-muted-foreground/70 mt-0.5">
+          <p className="text-xs font-semibold text-muted-foreground">No drinks logged yet today</p>
+          <p className="text-[10px] text-muted-foreground/70 mt-0.5">
             Log your first glass from the Home tab!
           </p>
         </div>
       ) : (
-        <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-1.5 pr-1">
           {sorted.map((entry) => (
             <div
               key={entry.id}
-              className="flex items-center justify-between p-3 rounded-2xl bg-surface-subtle/70 hover:bg-surface-subtle transition-colors"
+              className="flex items-center justify-between p-2 rounded-xl bg-surface-subtle/70 hover:bg-surface-subtle transition-colors"
             >
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-accent-subtle text-accent flex items-center justify-center shrink-0">
-                  <Droplet className="w-4 h-4 fill-accent" />
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-accent-subtle text-accent flex items-center justify-center shrink-0">
+                  <Droplet className="w-3.5 h-3.5 fill-accent" />
                 </div>
                 <div>
-                  <span className="text-sm font-bold text-foreground">
+                  <span className="text-xs font-bold text-foreground block leading-tight">
                     +{formatAmount(entry.amountMl)}
                   </span>
-                  <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-0.5">
-                    <Clock className="w-3 h-3" />
+                  <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                    <Clock className="w-2.5 h-2.5" />
                     <span>{formatTime(entry.timestamp)}</span>
                   </div>
                 </div>
@@ -70,10 +70,10 @@ export const TodayEntriesList: React.FC<TodayEntriesListProps> = ({
 
               <button
                 onClick={() => onRemove(entry.id)}
-                className="w-8 h-8 rounded-xl flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:scale-95 transition-all"
+                className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-red-500 hover:bg-red-500/10 active:scale-95 transition-all"
                 aria-label="Delete entry"
               >
-                <Trash2 className="w-4 h-4" />
+                <Trash2 className="w-3.5 h-3.5" />
               </button>
             </div>
           ))}

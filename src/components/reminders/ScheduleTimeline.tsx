@@ -45,34 +45,34 @@ export const ScheduleTimeline: React.FC<ScheduleTimelineProps> = ({
   let cumulativeActiveMl = 0;
 
   return (
-    <div className="p-5 rounded-3xl bg-surface border border-surface-border shadow-sm mb-6">
-      <div className="flex items-center justify-between mb-3">
+    <div className="flex-1 flex flex-col min-h-0 p-3.5 rounded-2xl bg-surface border border-surface-border shadow-2xs">
+      <div className="flex items-center justify-between mb-2 shrink-0">
         <div>
-          <h3 className="text-sm font-bold text-foreground flex items-center gap-1.5">
-            {isAutoSchedule && <Sparkles className="w-4 h-4 text-accent shrink-0" />}
+          <h3 className="text-xs font-bold text-foreground flex items-center gap-1.5">
+            {isAutoSchedule && <Sparkles className="w-3.5 h-3.5 text-accent shrink-0" />}
             <span>{isAutoSchedule ? 'Daily Timetable' : 'Custom Schedule'}</span>
           </h3>
-          <p className="text-[11px] text-muted-foreground mt-0.5">
+          <p className="text-[10px] text-muted-foreground mt-0.5">
             {intervalText ? `${intervalText} • ` : ''}{formatAmount(totalMlTarget)} total
           </p>
         </div>
-        <span className="text-xs font-semibold text-muted-foreground bg-surface-subtle px-2.5 py-1 rounded-full shrink-0">
+        <span className="text-[10px] font-bold text-muted-foreground bg-surface-subtle px-2 py-0.5 rounded-full shrink-0">
           {activeCount} {activeCount === 1 ? 'drink' : 'drinks'}
         </span>
       </div>
 
       {slots.length === 0 ? (
-        <div className="py-8 text-center">
-          <div className="w-12 h-12 mx-auto rounded-full bg-surface-subtle flex items-center justify-center text-muted-foreground mb-2">
-            <Droplet className="w-6 h-6 opacity-40" />
+        <div className="flex-1 flex flex-col items-center justify-center py-4 text-center">
+          <div className="w-10 h-10 mx-auto rounded-full bg-surface-subtle flex items-center justify-center text-muted-foreground mb-1.5">
+            <Droplet className="w-5 h-5 opacity-40" />
           </div>
-          <p className="text-sm font-medium text-muted-foreground">No reminders scheduled</p>
-          <p className="text-xs text-muted-foreground/70 mt-0.5">
-            Adjust wake & sleep hours or add slots.
+          <p className="text-xs font-semibold text-muted-foreground">No reminders scheduled</p>
+          <p className="text-[10px] text-muted-foreground/70 mt-0.5">
+            Adjust wake & sleep hours to generate slots.
           </p>
         </div>
       ) : (
-        <div className="space-y-2 max-h-72 overflow-y-auto pr-1">
+        <div className="flex-1 min-h-0 overflow-y-auto space-y-1.5 pr-1">
           {slots.map((slot) => {
             const slotMinutes = parseTimeToMinutes(slot.timeStr);
             const isPast = slotMinutes < currentMinutes;
@@ -90,7 +90,7 @@ export const ScheduleTimeline: React.FC<ScheduleTimelineProps> = ({
                   haptic.tap();
                   onToggleSlot(slot.id);
                 }}
-                className={`flex items-center justify-between p-3 rounded-2xl border transition-all cursor-pointer select-none active:scale-[0.99] ${
+                className={`flex items-center justify-between p-2 rounded-xl border transition-all cursor-pointer select-none active:scale-[0.99] ${
                   slot.active
                     ? isFulfilled
                       ? 'bg-surface border-emerald-500/30 hover:bg-surface-subtle/50'
@@ -98,9 +98,9 @@ export const ScheduleTimeline: React.FC<ScheduleTimelineProps> = ({
                     : 'bg-surface-subtle/30 border-dashed border-surface-border opacity-50'
                 }`}
               >
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2.5">
                   <div
-                    className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 font-bold ${
+                    className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 font-bold ${
                       slot.active
                         ? isFulfilled
                           ? 'bg-emerald-500/15 text-emerald-500'
@@ -109,29 +109,29 @@ export const ScheduleTimeline: React.FC<ScheduleTimelineProps> = ({
                     }`}
                   >
                     {isFulfilled && slot.active ? (
-                      <CheckCircle className="w-4 h-4 text-emerald-500" />
+                      <CheckCircle className="w-3.5 h-3.5 text-emerald-500" />
                     ) : (
                       <Droplet
-                        className={`w-4 h-4 ${
+                        className={`w-3.5 h-3.5 ${
                           slot.active ? 'fill-accent text-accent' : 'text-muted-foreground'
                         }`}
                       />
                     )}
                   </div>
                   <div>
-                    <span className="text-sm font-bold text-foreground">
+                    <span className="text-xs font-bold text-foreground block leading-tight">
                       +{formatAmount(slot.targetMl)}
                     </span>
-                    <div className="flex items-center gap-1 text-[11px] text-muted-foreground mt-0.5">
-                      <Clock className="w-3 h-3" />
+                    <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
+                      <Clock className="w-2.5 h-2.5" />
                       <span>{formatTo12Hour(slot.timeStr)}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <span
-                    className={`text-[11px] px-2.5 py-1 rounded-xl font-bold transition-all ${
+                    className={`text-[10px] px-2 py-0.5 rounded-lg font-bold transition-all ${
                       slot.active
                         ? isFulfilled
                           ? 'bg-emerald-500/10 text-emerald-500'

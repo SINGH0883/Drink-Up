@@ -21,10 +21,10 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
   onRemoveEntry,
 }) => {
   return (
-    <div className="flex flex-col min-h-full pb-8">
+    <div className="flex-1 flex flex-col h-full min-h-0 overflow-hidden pb-1">
       <Header title="Hydration History" subtitle="Your drinking trends & records" />
 
-      <main className="flex-1 px-4 py-2 max-w-md mx-auto w-full">
+      <main className="flex-1 px-3.5 pt-1 pb-2 max-w-md mx-auto w-full flex flex-col gap-2.5 min-h-0">
         {/* Streak Record Cards */}
         <StreakCard
           currentStreak={stats.streakDays}
@@ -38,7 +38,7 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
           unit={settings.unit}
         />
 
-        {/* Today's Logged Drinks List */}
+        {/* Today's Logged Drinks List - Expands to fill screen */}
         <TodayEntriesList
           entries={todayLog.entries}
           unit={settings.unit}

@@ -63,11 +63,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     }
   };
 
-  const alertTypes: { type: AlertType; label: string; icon: React.FC<{ className?: string }>; desc: string }[] = [
-    { type: 'both', label: 'Sound + Buzz', icon: Volume2, desc: 'Play sound and vibrate phone' },
-    { type: 'buzz', label: 'Buzz Only', icon: Vibrate, desc: 'Vibration only (meetings & work)' },
-    { type: 'sound', label: 'Sound Only', icon: Volume2, desc: 'Play notification chime' },
-    { type: 'silent', label: 'Silent', icon: VolumeX, desc: 'Quiet tray notification' },
+  const alertTypes: { type: AlertType; label: string; icon: React.FC<{ className?: string }> }[] = [
+    { type: 'both', label: 'Sound + Buzz', icon: Volume2 },
+    { type: 'buzz', label: 'Buzz Only', icon: Vibrate },
+    { type: 'sound', label: 'Sound Only', icon: Volume2 },
+    { type: 'silent', label: 'Silent', icon: VolumeX },
   ];
 
   const handleSelectAlertType = (type: AlertType) => {
@@ -75,14 +75,44 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
     onUpdateNotifSettings({ alertType: type });
   };
 
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
+
   const soundTones: { id: SoundTone; label: string }[] = [
-    { id: 'voice_announcement', label: 'Indian Girl 👧' },
-    { id: 'voice_hindi', label: 'Hindi Voice 🌸' },
+    { id: 'voice_announcement', label: 'Indian Voice 👧' },
     { id: 'water_drop', label: 'Water Drop 💧' },
     { id: 'gentle_chime', label: 'Gentle Chime 🔔' },
     { id: 'soft_bell', label: 'Soft Bell 🎵' },
     { id: 'crystal_ping', label: 'Crystal Ping ✨' },
+    {
+      id: 'custom',
+      label: notifSettings.customSoundName
+        ? `${notifSettings.customSoundName.length > 13 ? notifSettings.customSoundName.slice(0, 11) + '..' : notifSettings.customSoundName} 📁`
+        : 'Choose File 📁',
+    },
   ];
+
+  const handleCustomAudioUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      if (dataUrl) {
+        try {
+          localStorage.setItem('drinkup_custom_audio', dataUrl);
+        } catch {}
+        onUpdateNotifSettings({
+          soundTone: 'custom',
+          customSoundData: dataUrl,
+          customSoundName: file.name,
+        });
+        haptic.success();
+        playTone('custom', settings.userName, settings.defaultCupMl || 150, dataUrl);
+      }
+    };
+    reader.readAsDataURL(file);
+    e.target.value = '';
+  };
 
   const messageStyles: { id: MessageStyle; label: string; preview: string }[] = [
     {
@@ -104,7 +134,11 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
   const handleToneSelect = (tone: SoundTone) => {
     haptic.tap();
-    playTone(tone, settings.userName, settings.defaultCupMl || 150);
+    if (tone === 'custom' && !notifSettings.customSoundData) {
+      fileInputRef.current?.click();
+      return;
+    }
+    playTone(tone, settings.userName, settings.defaultCupMl || 150, notifSettings.customSoundData);
     onUpdateNotifSettings({ soundTone: tone });
   };
 
@@ -232,12 +266,18 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         </div>
 
         {/* Alert Style */}
-        <div className="p-5 rounded-3xl bg-surface border border-surface-border shadow-sm space-y-3">
-          <div className="flex items-center gap-2 mb-1">
-            <Bell className="w-4 h-4 text-accent" />
-            <h3 className="text-sm font-bold text-foreground">Alert Style</h3>
+        <div className="p-4 rounded-3xl bg-surface border border-surface-border shadow-sm space-y-2.5">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-accent" />
+              <h3 className="text-sm font-bold text-foreground">Alert Style</h3>
+            </div>
+            <span className="text-[11px] font-semibold text-muted-foreground">
+              {alertTypes.find((a) => a.type === notifSettings.alertType)?.label}
+            </span>
           </div>
-          <div className="grid grid-cols-2 gap-2.5">
+
+          <div className="grid grid-cols-2 gap-2">
             {alertTypes.map((item) => {
               const Icon = item.icon;
               const isSelected = notifSettings.alertType === item.type;
@@ -246,23 +286,22 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                 <button
                   key={item.type}
                   onClick={() => handleSelectAlertType(item.type)}
-                  className={`flex flex-col items-start p-3 rounded-2xl border text-left transition-all ${
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-2xl border text-left transition-all active:scale-98 ${
                     isSelected
-                      ? 'border-accent bg-accent/5 ring-1 ring-accent text-foreground'
+                      ? 'border-accent bg-accent/10 ring-1 ring-accent text-foreground font-bold shadow-2xs'
                       : 'border-surface-border bg-surface-subtle/50 text-muted-foreground hover:bg-surface-subtle'
                   }`}
                 >
                   <div
-                    className={`w-7 h-7 rounded-lg flex items-center justify-center mb-2 ${
-                      isSelected ? 'bg-accent text-white' : 'bg-surface-subtle text-muted-foreground'
+                    className={`w-7 h-7 rounded-xl flex items-center justify-center shrink-0 transition-colors ${
+                      isSelected
+                        ? 'bg-accent text-white shadow-2xs'
+                        : 'bg-surface text-muted-foreground border border-surface-border'
                     }`}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-3.5 h-3.5" />
                   </div>
-                  <span className="text-xs font-bold text-foreground">{item.label}</span>
-                  <span className="text-[10px] text-muted-foreground mt-0.5 leading-tight">
-                    {item.desc}
-                  </span>
+                  <span className="text-xs font-bold truncate">{item.label}</span>
                 </button>
               );
             })}
@@ -276,21 +315,40 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
               <Volume2 className="w-4 h-4 text-accent" />
               <h3 className="text-sm font-bold text-foreground">Notification Sound</h3>
             </div>
+            {/* Hidden file input for custom audio */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="audio/*"
+              onChange={handleCustomAudioUpload}
+              className="hidden"
+            />
             <div className="grid grid-cols-2 gap-2">
-              {soundTones.map((item) => (
-                <button
-                  key={item.id}
-                  onClick={() => handleToneSelect(item.id)}
-                  className={`flex items-center justify-between px-3 py-3 rounded-2xl border text-left transition-all min-h-[46px] ${
-                    notifSettings.soundTone === item.id
-                      ? 'border-accent bg-accent/5 ring-1 ring-accent text-foreground font-bold'
-                      : 'border-surface-border bg-surface-subtle/50 text-muted-foreground hover:bg-surface-subtle'
-                  }`}
-                >
-                  <span className="text-xs font-medium truncate mr-1">{item.label}</span>
-                  <Play className="w-3 h-3 opacity-60 shrink-0" />
-                </button>
-              ))}
+              {soundTones.map((item) => {
+                const isSelected = notifSettings.soundTone === item.id;
+                const isCustom = item.id === 'custom';
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      if (isCustom && isSelected) {
+                        // Open file picker to change file if already selected
+                        fileInputRef.current?.click();
+                      } else {
+                        handleToneSelect(item.id);
+                      }
+                    }}
+                    className={`flex items-center justify-between px-3 py-3 rounded-2xl border text-left transition-all min-h-[46px] ${
+                      isSelected
+                        ? 'border-accent bg-accent/5 ring-1 ring-accent text-foreground font-bold'
+                        : 'border-surface-border bg-surface-subtle/50 text-muted-foreground hover:bg-surface-subtle'
+                    }`}
+                  >
+                    <span className="text-xs font-medium truncate mr-1">{item.label}</span>
+                    <Play className="w-3 h-3 opacity-60 shrink-0" />
+                  </button>
+                );
+              })}
             </div>
           </div>
         )}
@@ -336,34 +394,42 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         </div>
 
         {/* Preview / Test Alert Button */}
-        <div className="p-4 rounded-2xl bg-gradient-to-r from-accent/10 to-sky-500/10 border border-accent/25 flex items-center justify-between shadow-sm">
-          <div>
-            <span className="text-xs font-bold text-foreground">Test Notification</span>
-            <p className="text-[11px] text-muted-foreground mt-0.5">
-              Preview sound & voice with current settings
-            </p>
+        <div className="p-3 rounded-2xl bg-surface border border-surface-border shadow-2xs flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="w-8 h-8 rounded-xl bg-accent/15 text-accent flex items-center justify-center shrink-0">
+              <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+            </div>
+            <div className="min-w-0">
+              <span className="text-xs font-bold text-foreground block leading-tight truncate">Test Notification</span>
+              <p className="text-[10px] text-muted-foreground mt-0.5 truncate">
+                Preview sound & voice with current settings
+              </p>
+            </div>
           </div>
           <button
             onClick={onTestNotification}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-accent text-white text-xs font-bold shadow-md hover:bg-accent-hover active:scale-95 transition-all"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-accent text-white text-xs font-bold shadow-xs hover:bg-accent-hover active:scale-95 transition-all shrink-0 whitespace-nowrap"
           >
-            <Play className="w-3.5 h-3.5 fill-white" />
             <span>Test Now</span>
           </button>
         </div>
 
 
         {/* Reset / Clear Data */}
-        <div className="pt-2">
+        <div className="pt-1">
           {showResetConfirm ? (
-            <div className="p-4 rounded-2xl bg-red-500/10 border border-red-500/30 space-y-3">
-              <p className="text-xs font-bold text-red-600 dark:text-red-400">
-                Are you sure? This will delete all hydration history and reset settings.
+            <div className="p-3.5 rounded-2xl bg-surface border border-rose-200 dark:border-rose-900/50 shadow-2xs space-y-2.5 animate-fill-up">
+              <div className="flex items-center gap-2 text-rose-500">
+                <Trash2 className="w-4 h-4 shrink-0" />
+                <span className="text-xs font-bold">Reset all data & history?</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground leading-relaxed">
+                This will delete your water logs and reset daily goals to default.
               </p>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2 pt-0.5">
                 <button
                   onClick={() => setShowResetConfirm(false)}
-                  className="flex-1 py-2 rounded-xl bg-surface text-xs font-semibold text-foreground border border-surface-border"
+                  className="flex-1 py-2 px-3 rounded-xl bg-surface-subtle text-xs font-bold text-muted-foreground hover:text-foreground border border-surface-border transition-colors active:scale-95"
                 >
                   Cancel
                 </button>
@@ -372,7 +438,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
                     onClearAllData();
                     setShowResetConfirm(false);
                   }}
-                  className="flex-1 py-2 rounded-xl bg-red-500 text-white text-xs font-bold active:scale-95"
+                  className="flex-1 py-2 px-3 rounded-xl bg-rose-500 text-white text-xs font-bold shadow-xs hover:bg-rose-600 transition-colors active:scale-95"
                 >
                   Yes, Reset
                 </button>
@@ -381,39 +447,34 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           ) : (
             <button
               onClick={() => setShowResetConfirm(true)}
-              className="w-full flex items-center justify-center gap-2 py-3.5 rounded-2xl bg-surface-subtle text-red-500 text-xs font-bold hover:bg-red-500/10 active:scale-98 transition-all"
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-surface border border-surface-border text-rose-500 text-xs font-bold hover:bg-rose-500/5 hover:border-rose-200 active:scale-98 transition-all shadow-2xs"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="w-3.5 h-3.5" />
               <span>Reset All Data & Logs</span>
             </button>
           )}
         </div>
 
-        {/* Creator Watermark */}
-        <div className="pt-4 pb-6 flex flex-col items-center justify-center gap-1.5 opacity-90 hover:opacity-100 transition-opacity">
+        {/* Creator Watermark - Single Clean Line */}
+        <div className="pt-3 pb-6 flex items-center justify-center">
           <a
             href="https://github.com/SINGH0883"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-surface border border-surface-border shadow-xs backdrop-blur-md hover:border-accent/40 active:scale-95 transition-all group"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-surface border border-surface-border shadow-2xs backdrop-blur-md hover:border-accent/40 active:scale-95 transition-all group text-[11px]"
           >
             <Sparkles className="w-3.5 h-3.5 text-accent animate-pulse" />
-            <span className="text-[11px] font-bold text-foreground">
-              Drink Up <span className="text-muted-foreground font-medium">v1.0</span>
+            <span className="font-bold text-foreground">
+              Drink Up <span className="text-muted-foreground font-normal">v1.0</span>
             </span>
             <span className="text-[10px] text-muted-foreground">•</span>
-            <span className="text-[11px] font-extrabold bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent group-hover:underline flex items-center gap-1">
+            <span className="text-muted-foreground flex items-center gap-1">
+              Crafted with <Heart className="w-3 h-3 text-red-500 fill-red-500 inline animate-bounce" /> by
+            </span>
+            <span className="font-extrabold bg-gradient-to-r from-sky-500 to-blue-600 bg-clip-text text-transparent group-hover:underline flex items-center gap-0.5">
               SINGH0883
               <ExternalLink className="w-3 h-3 text-sky-500 opacity-70 group-hover:opacity-100" />
             </span>
-          </a>
-          <a
-            href="https://github.com/SINGH0883"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[10px] font-medium text-muted-foreground/80 hover:text-foreground transition-colors flex items-center gap-1"
-          >
-            Crafted with <Heart className="w-3 h-3 text-red-500 fill-red-500 inline animate-bounce" /> by <span className="font-bold underline decoration-accent/40">SINGH0883</span>
           </a>
         </div>
       </main>

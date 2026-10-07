@@ -19,15 +19,18 @@ export function useWaterLog() {
   const [allLogs, setAllLogs] = useState<Record<string, DayLog>>({});
   const [todayKey, setTodayKey] = useState<string>(getTodayKey());
   const [undoEntry, setUndoEntry] = useState<{ entry: WaterLogEntry; timeoutId: number } | null>(null);
+  const [savedBestStreak, setSavedBestStreak] = useState<number>(0);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load initial settings & history
+  // Load initial settings, history & best streak record
   useEffect(() => {
     async function loadData() {
       const savedSettings = await storage.get<UserSettings>(STORAGE_KEYS.SETTINGS, DEFAULT_USER_SETTINGS);
       const savedLogs = await storage.get<Record<string, DayLog>>(STORAGE_KEYS.LOGS, {});
+      const storedBest = await storage.get<number>(STORAGE_KEYS.STREAK, 0);
       setSettings(savedSettings);
       setAllLogs(savedLogs);
+      setSavedBestStreak(storedBest);
       setIsLoaded(true);
     }
     loadData();
@@ -65,60 +68,93 @@ export function useWaterLog() {
     return todayLog.entries.reduce((acc, curr) => acc + curr.amountMl, 0);
   }, [todayLog]);
 
-  // Compute Streak
+  // Compute Streak & Best Record accurately across calendar history
   const streakStats = useMemo(() => {
-    let currentStreak = 0;
-    let bestStreak = 0;
-    let tempStreak = 0;
-
-    const dates = Object.keys(allLogs).sort();
-    
-    // Check backwards from yesterday
-    const today = new Date();
-    
-    // Calculate best streak across full history
-    dates.forEach((d) => {
+    // 1. Gather all active date keys
+    const activeDateSet = new Set<string>();
+    Object.keys(allLogs).forEach((d) => {
       const log = allLogs[d];
-      const total = log.entries.reduce((s, e) => s + e.amountMl, 0);
-      if (total >= (log.goalMl || settings.dailyGoalMl)) {
-        tempStreak++;
-        if (tempStreak > bestStreak) bestStreak = tempStreak;
-      } else {
-        tempStreak = 0;
+      const total = (log?.entries || []).reduce((s, e) => s + e.amountMl, 0);
+      if (total > 0) {
+        activeDateSet.add(d);
       }
     });
 
-    // Calculate active streak
-    let checkDate = new Date(today);
-    // If today is completed, start with 1, else start with 0 and check from yesterday
-    const isTodayComplete = todayTotalMl >= settings.dailyGoalMl;
-    if (isTodayComplete) {
-      currentStreak = 1;
+    const todayHasDrinks = todayTotalMl > 0 || (todayLog?.entries && todayLog.entries.length > 0);
+    if (todayHasDrinks) {
+      activeDateSet.add(todayKey);
     }
-    checkDate.setDate(checkDate.getDate() - 1);
 
-    while (true) {
+    // 2. Compute longest consecutive streak across all historical active dates
+    const sortedActiveDates = Array.from(activeDateSet).sort();
+    let maxHistoricalStreak = 0;
+    let runningStreak = 0;
+    let prevDate: Date | null = null;
+
+    sortedActiveDates.forEach((dateStr) => {
+      const currentDate = new Date(dateStr + 'T00:00:00');
+      if (!prevDate) {
+        runningStreak = 1;
+      } else {
+        const diffDays = Math.round((currentDate.getTime() - prevDate.getTime()) / (1000 * 60 * 60 * 24));
+        if (diffDays === 1) {
+          runningStreak++;
+        } else {
+          runningStreak = 1;
+        }
+      }
+      prevDate = currentDate;
+      if (runningStreak > maxHistoricalStreak) {
+        maxHistoricalStreak = runningStreak;
+      }
+    });
+
+    // 3. Compute current active streak backwards from today/yesterday
+    let currentStreak = 0;
+    const checkDate = new Date();
+
+    if (todayHasDrinks) {
+      currentStreak = 1;
+      checkDate.setDate(checkDate.getDate() - 1);
+    } else {
+      // If today not yet logged, check if yesterday was active to maintain ongoing streak
+      checkDate.setDate(checkDate.getDate() - 1);
       const y = checkDate.getFullYear();
       const m = (checkDate.getMonth() + 1).toString().padStart(2, '0');
       const d = checkDate.getDate().toString().padStart(2, '0');
-      const key = `${y}-${m}-${d}`;
-
-      const log = allLogs[key];
-      if (log) {
-        const total = log.entries.reduce((s, e) => s + e.amountMl, 0);
-        if (total >= (log.goalMl || settings.dailyGoalMl)) {
-          currentStreak++;
-          checkDate.setDate(checkDate.getDate() - 1);
-          continue;
-        }
+      const yesterdayKey = `${y}-${m}-${d}`;
+      if (activeDateSet.has(yesterdayKey)) {
+        currentStreak = 1;
+        checkDate.setDate(checkDate.getDate() - 1);
       }
-      break;
     }
 
-    if (currentStreak > bestStreak) bestStreak = currentStreak;
+    // Step backwards day-by-day to count uninterrupted consecutive days
+    if (currentStreak > 0) {
+      for (let i = 0; i < 365; i++) {
+        const y = checkDate.getFullYear();
+        const m = (checkDate.getMonth() + 1).toString().padStart(2, '0');
+        const d = checkDate.getDate().toString().padStart(2, '0');
+        const key = `${y}-${m}-${d}`;
 
-    return { currentStreak, bestStreak };
-  }, [allLogs, settings.dailyGoalMl, todayTotalMl]);
+        if (activeDateSet.has(key)) {
+          currentStreak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else {
+          break;
+        }
+      }
+    }
+
+    // 4. Stored all-time best record (high-water mark)
+    const effectiveBest = Math.max(savedBestStreak, maxHistoricalStreak, currentStreak);
+    if (effectiveBest > savedBestStreak) {
+      setSavedBestStreak(effectiveBest);
+      storage.set(STORAGE_KEYS.STREAK, effectiveBest);
+    }
+
+    return { currentStreak, bestStreak: effectiveBest };
+  }, [allLogs, todayTotalMl, todayLog, todayKey, savedBestStreak]);
 
   const stats = useMemo<HydrationStats>(() => {
     const isGoalReached = todayTotalMl >= settings.dailyGoalMl;

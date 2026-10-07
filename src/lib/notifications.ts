@@ -33,8 +33,8 @@ export const notificationService = {
         // Indian Girl Voice Channels (MAX importance for Screen Off / Lockscreen alerts)
         {
           id: NOTIFICATION_CHANNELS.BOTH_INDIAN_GIRL,
-          name: 'Indian Girl Voice (Sound & Vibration)',
-          description: 'Hydration reminders with Indian girl voice alert and vibration',
+          name: 'Female Voice (Sound & Vibration)',
+          description: 'Hydration reminders with female voice alert and vibration',
           importance: 5,
           visibility: 1,
           sound: 'indian_girl_voice.wav',
@@ -44,8 +44,8 @@ export const notificationService = {
         },
         {
           id: NOTIFICATION_CHANNELS.SOUND_INDIAN_GIRL,
-          name: 'Indian Girl Voice (Sound Only)',
-          description: 'Hydration reminders with Indian girl voice alert',
+          name: 'Female Voice (Sound Only)',
+          description: 'Hydration reminders with female voice alert',
           importance: 5,
           visibility: 1,
           sound: 'indian_girl_voice.wav',
@@ -53,31 +53,6 @@ export const notificationService = {
           lights: true,
           lightColor: '#00BCD4',
         },
-
-        // Hindi Voice Channels
-        {
-          id: NOTIFICATION_CHANNELS.BOTH_HINDI_GIRL,
-          name: 'Hindi Voice (Sound & Vibration)',
-          description: 'Hydration reminders with sweet Hindi voice and vibration',
-          importance: 5,
-          visibility: 1,
-          sound: 'hindi_girl_voice.wav',
-          vibration: true,
-          lights: true,
-          lightColor: '#FF9800',
-        },
-        {
-          id: NOTIFICATION_CHANNELS.SOUND_HINDI_GIRL,
-          name: 'Hindi Voice (Sound Only)',
-          description: 'Hydration reminders with sweet Hindi voice',
-          importance: 5,
-          visibility: 1,
-          sound: 'hindi_girl_voice.wav',
-          vibration: false,
-          lights: true,
-          lightColor: '#FF9800',
-        },
-
         // Sound & Vibration Channels (Default: MAX importance)
         {
           id: NOTIFICATION_CHANNELS.BOTH_WATER_DROP,
@@ -278,8 +253,6 @@ export const notificationService = {
     switch (tone) {
       case 'voice_announcement':
         return isBoth ? NOTIFICATION_CHANNELS.BOTH_INDIAN_GIRL : NOTIFICATION_CHANNELS.SOUND_INDIAN_GIRL;
-      case 'voice_hindi':
-        return isBoth ? NOTIFICATION_CHANNELS.BOTH_HINDI_GIRL : NOTIFICATION_CHANNELS.SOUND_HINDI_GIRL;
       case 'water_drop':
         return isBoth ? NOTIFICATION_CHANNELS.BOTH_WATER_DROP : NOTIFICATION_CHANNELS.SOUND_WATER_DROP;
       case 'gentle_chime':
@@ -288,6 +261,8 @@ export const notificationService = {
         return isBoth ? NOTIFICATION_CHANNELS.BOTH_SOFT_BELL : NOTIFICATION_CHANNELS.SOUND_SOFT_BELL;
       case 'crystal_ping':
         return isBoth ? NOTIFICATION_CHANNELS.BOTH_CRYSTAL_PING : NOTIFICATION_CHANNELS.SOUND_CRYSTAL_PING;
+      case 'custom':
+        return isBoth ? NOTIFICATION_CHANNELS.BOTH_WATER_DROP : NOTIFICATION_CHANNELS.SOUND_WATER_DROP;
       default:
         return isBoth ? NOTIFICATION_CHANNELS.BOTH_INDIAN_GIRL : NOTIFICATION_CHANNELS.SOUND_INDIAN_GIRL;
     }
@@ -298,8 +273,6 @@ export const notificationService = {
     switch (tone) {
       case 'voice_announcement':
         return 'indian_girl_voice.wav';
-      case 'voice_hindi':
-        return 'hindi_girl_voice.wav';
       case 'water_drop':
         return 'water_drop.wav';
       case 'gentle_chime':
@@ -308,6 +281,8 @@ export const notificationService = {
         return 'soft_bell.wav';
       case 'crystal_ping':
         return 'crystal_ping.wav';
+      case 'custom':
+        return 'gentle_chime.wav';
       default:
         return 'indian_girl_voice.wav';
     }
