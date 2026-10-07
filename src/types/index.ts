@@ -35,6 +35,7 @@ export interface UserSettings {
   theme?: ThemeMode;
   autoSchedule: boolean;
   onboardingCompleted: boolean;
+  tourCompleted?: boolean;
 }
 
 export interface NotificationSettings {

@@ -13,6 +13,7 @@ import {
   Sparkles,
   Heart,
   ExternalLink,
+  Compass,
 } from 'lucide-react';
 import { Header } from '../components/common/Header';
 import {
@@ -34,6 +35,7 @@ interface SettingsPageProps {
   onUpdateNotifSettings: (changes: Partial<NotificationSettings>) => void;
   onTestNotification: () => void;
   onClearAllData: () => void;
+  onStartTour?: () => void;
 }
 
 export const SettingsPage: React.FC<SettingsPageProps> = ({
@@ -43,6 +45,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
   onUpdateNotifSettings,
   onTestNotification,
   onClearAllData,
+  onStartTour,
 }) => {
   const [userName, setUserName] = useState<string>(settings.userName || '');
   const [userAge, setUserAge] = useState<string>(settings.age ? settings.age.toString() : '');
@@ -156,7 +159,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
       <main className="flex-1 px-4 py-2 max-w-md mx-auto w-full space-y-4">
         {/* User Profile */}
-        <div className="p-5 rounded-3xl bg-surface border border-surface-border shadow-sm space-y-3">
+        <div id="tour-settings-profile" className="p-5 rounded-3xl bg-surface border border-surface-border shadow-sm space-y-3">
           <div className="flex items-center gap-2">
             <User className="w-4 h-4 text-accent" />
             <h3 className="text-sm font-bold text-foreground">Your Profile</h3>
@@ -195,7 +198,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
         </div>
 
         {/* Daily Hydration Goal */}
-        <div className="p-5 rounded-3xl bg-surface border border-surface-border shadow-sm space-y-3">
+        <div id="tour-settings-goals" className="p-5 rounded-3xl bg-surface border border-surface-border shadow-sm space-y-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Target className="w-4 h-4 text-accent" />
@@ -310,7 +313,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
 
         {/* Notification Sound */}
         {(notifSettings.alertType === 'sound' || notifSettings.alertType === 'both') && (
-          <div className="p-5 rounded-3xl bg-surface border border-surface-border shadow-sm space-y-3">
+          <div id="tour-settings-sounds" className="p-5 rounded-3xl bg-surface border border-surface-border shadow-sm space-y-3">
             <div className="flex items-center gap-2 mb-1">
               <Volume2 className="w-4 h-4 text-accent" />
               <h3 className="text-sm font-bold text-foreground">Notification Sound</h3>
@@ -414,6 +417,34 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({
           </button>
         </div>
 
+
+        {/* App Tour */}
+        {onStartTour && (
+          <div className="p-4 rounded-3xl bg-surface border border-surface-border shadow-sm flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-accent-subtle text-accent flex items-center justify-center shrink-0">
+                <Compass className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <span className="text-xs font-bold text-foreground block leading-tight">
+                  App Tour
+                </span>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
+                  Quick walkthrough of features
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                haptic.tap();
+                onStartTour();
+              }}
+              className="px-3.5 py-1.5 rounded-xl bg-accent text-white text-xs font-bold shadow-2xs hover:bg-accent-hover active:scale-95 transition-all shrink-0"
+            >
+              Start
+            </button>
+          </div>
+        )}
 
         {/* Reset / Clear Data */}
         <div className="pt-1">

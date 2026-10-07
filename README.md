@@ -12,10 +12,10 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 [![Vite](https://img.shields.io/badge/Vite-6.2-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
-[![Size: 3.39 MB](https://img.shields.io/badge/APK_Size-3.39_MB-success?style=for-the-badge&logo=android)](https://github.com/SINGH0883/Drink-Up/raw/main/drink-up.apk)
+[![Size: 5.29 MB](https://img.shields.io/badge/APK_Size-5.29_MB-success?style=for-the-badge&logo=android)](https://github.com/SINGH0883/Drink-Up/raw/main/drink-up.apk)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
 
-[📥 **Download Android APK (3.39 MB - Under 4 MB)**](https://github.com/SINGH0883/Drink-Up/raw/main/drink-up.apk)
+[📥 **Download Android APK (5.29 MB)**](https://github.com/SINGH0883/Drink-Up/raw/main/drink-up.apk)
 
 </div>
 
@@ -23,7 +23,7 @@
 
 ## 📱 About Drink Up
 
-**Drink Up** is a smart, modern hydration companion designed to help you build and maintain healthy daily drinking habits. Built with **React 19**, **Tailwind CSS**, and **Capacitor 7**, Drink Up offers fluid animations, personalized hydration targets, intelligent reminders, expressive Indian female voice alerts, and detailed hydration analytics — packaged in an ultra-optimized **3.39 MB Android APK** (strictly under 4 MB).
+**Drink Up** is a smart, modern hydration companion designed to help you build and maintain healthy daily drinking habits. Built with **React 19**, **Tailwind CSS**, and **Capacitor 7**, Drink Up offers fluid animations, personalized hydration targets, intelligent reminders, expressive Indian female voice alerts, and detailed hydration analytics — packaged in an optimized **5.29 MB Android APK** featuring full HD animated background graphics.
 
 ---
 
@@ -68,10 +68,9 @@
 - **Drink Breakdown**: Chronological log with timestamps and volumes.
 - **Streak Tracker**: Tracks consecutive days of hitting your goal to keep you motivated.
 
-### 🚀 8. Ultra-Lightweight Performance (< 4 MB APK)
-- **Targeted ABI Architecture**: ARM64 and ARMv7 optimized for lightning-fast launch and minimal footprint.
-- **8-Bit Palette Asset Optimization**: Full HD graphics with zero pixelation and minimal asset overhead.
-- **ProGuard / R8 Resource Shrinking**: Release APK size strictly **3.39 MB** (down from 9.6 MB).
+### 🚀 8. High Performance & Optimization
+- **Targeted ABI Architecture**: ARM64 optimized for lightning-fast launch and minimal footprint.
+- **ProGuard / R8 Resource Shrinking**: Minified and stripped unused resources.
 - **Theme Modes**: Seamless Light and Dark mode support.
 - **Units**: Supports both Metric (`ml`) and Imperial (`fl oz`).
 
@@ -81,7 +80,7 @@
 
 You can download the pre-built Android APK directly from this repository:
 
-👉 **[Download `drink-up.apk` (3.39 MB)](https://github.com/SINGH0883/Drink-Up/raw/main/drink-up.apk)**
+👉 **[Download `drink-up.apk` (5.29 MB)](https://github.com/SINGH0883/Drink-Up/raw/main/drink-up.apk)**
 
 ### Installation Steps on Android:
 1. Download `drink-up.apk` onto your Android smartphone.

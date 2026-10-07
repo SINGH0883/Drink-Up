@@ -26,24 +26,30 @@ export const HistoryPage: React.FC<HistoryPageProps> = ({
 
       <main className="flex-1 px-3.5 pt-1 pb-2 max-w-md mx-auto w-full flex flex-col gap-2.5 min-h-0">
         {/* Streak Record Cards */}
-        <StreakCard
-          currentStreak={stats.streakDays}
-          bestStreak={stats.bestStreakDays}
-        />
+        <div id="tour-history-streak">
+          <StreakCard
+            currentStreak={stats.streakDays}
+            bestStreak={stats.bestStreakDays}
+          />
+        </div>
 
         {/* Weekly Bar Chart */}
-        <WeeklyBarChart
-          logs={allLogs}
-          dailyGoalMl={settings.dailyGoalMl}
-          unit={settings.unit}
-        />
+        <div id="tour-history-chart">
+          <WeeklyBarChart
+            logs={allLogs}
+            dailyGoalMl={settings.dailyGoalMl}
+            unit={settings.unit}
+          />
+        </div>
 
         {/* Today's Logged Drinks List - Expands to fill screen */}
-        <TodayEntriesList
-          entries={todayLog.entries}
-          unit={settings.unit}
-          onRemove={onRemoveEntry}
-        />
+        <div id="tour-history-list" className="flex-1 min-h-0 flex flex-col">
+          <TodayEntriesList
+            entries={todayLog.entries}
+            unit={settings.unit}
+            onRemove={onRemoveEntry}
+          />
+        </div>
       </main>
     </div>
   );

@@ -26,8 +26,8 @@ export const QuickAddButtons: React.FC<QuickAddButtonsProps> = ({ onAdd, unit })
       amount: 150,
       label: 'Small Cup',
       icon: Coffee,
-      badgeColor: 'from-amber-500/15 to-orange-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20',
-      iconColor: 'text-amber-600 dark:text-amber-400',
+      badgeColor: 'bg-amber-100 dark:bg-amber-950/80 border-amber-300 dark:border-amber-700/60 shadow-xs',
+      iconColor: 'text-amber-700 dark:text-amber-300',
     },
     {
       amount: 250,
@@ -35,23 +35,23 @@ export const QuickAddButtons: React.FC<QuickAddButtonsProps> = ({ onAdd, unit })
       icon: GlassWater,
       highlight: true,
       tag: 'POPULAR',
-      badgeColor: 'from-sky-500/25 to-blue-600/25 text-sky-600 dark:text-sky-300 border-sky-400/40',
-      iconColor: 'text-sky-500 dark:text-sky-300',
+      badgeColor: 'bg-sky-100 dark:bg-sky-950/80 border-sky-300 dark:border-sky-700/60 shadow-xs',
+      iconColor: 'text-sky-700 dark:text-sky-300',
     },
     {
       amount: 500,
       label: 'Bottle',
       icon: Droplets,
-      badgeColor: 'from-teal-500/15 to-emerald-500/10 text-teal-600 dark:text-teal-400 border-teal-500/20',
-      iconColor: 'text-teal-600 dark:text-teal-400',
+      badgeColor: 'bg-teal-100 dark:bg-teal-950/80 border-teal-300 dark:border-teal-700/60 shadow-xs',
+      iconColor: 'text-teal-700 dark:text-teal-300',
     },
   ];
 
   return (
     <div className="w-full px-3.5 my-1">
       <div className="flex items-center justify-between mb-2 px-1">
-        <span className="text-[11px] font-black uppercase tracking-wider text-slate-700 dark:text-slate-300 bg-white/90 dark:bg-slate-900/90 px-2.5 py-1 rounded-full backdrop-blur-md border border-sky-100 dark:border-slate-800 flex items-center gap-1.5 shadow-2xs">
-          <Droplets className="w-3.5 h-3.5 text-sky-500" />
+        <span className="glass-pill text-[11px] font-black uppercase tracking-wider text-slate-900 dark:text-slate-100 px-3.5 py-1 rounded-full flex items-center gap-1.5 shadow-md">
+          <Droplets className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 fill-sky-500/20" />
           <span>Quick Log</span>
         </span>
       </div>
@@ -63,33 +63,33 @@ export const QuickAddButtons: React.FC<QuickAddButtonsProps> = ({ onAdd, unit })
             <button
               key={btn.amount}
               onClick={() => handleAdd(btn.amount)}
-              className={`relative flex flex-col items-center justify-center p-3 rounded-2xl border transition-all duration-200 active:scale-95 group overflow-hidden ${
+              className={`relative flex flex-col items-center justify-center p-3 rounded-2xl transition-all duration-200 active:scale-95 group overflow-hidden ${
                 btn.highlight
-                  ? 'bg-white dark:bg-slate-900 border-sky-400 ring-2 ring-sky-400/30 shadow-lg shadow-sky-500/15'
-                  : 'bg-white dark:bg-slate-900 border-slate-200/90 dark:border-slate-800 hover:border-sky-300 shadow-sm'
+                  ? 'glass-card-highlight ring-2 ring-sky-500/50 shadow-xl shadow-sky-500/20'
+                  : 'glass-card hover:border-sky-400/80 shadow-lg'
               }`}
             >
               {/* Popular Badge */}
               {btn.tag && (
-                <div className="absolute top-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-sky-500 to-blue-600 text-white text-[8px] font-black tracking-widest uppercase shadow-2xs">
+                <div className="absolute top-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-sky-600 to-blue-600 text-white text-[8px] font-black tracking-widest uppercase shadow-md">
                   {btn.tag}
                 </div>
               )}
 
               {/* Glowing Icon Container */}
               <div
-                className={`w-10 h-10 rounded-xl bg-gradient-to-br border flex items-center justify-center mb-1.5 transition-transform duration-200 group-hover:scale-110 shadow-2xs ${
+                className={`w-10 h-10 rounded-xl border flex items-center justify-center mb-1.5 transition-transform duration-200 group-hover:scale-110 ${
                   btn.badgeColor
                 } ${btn.highlight ? 'mt-2' : ''}`}
               >
-                <Icon className={`w-5 h-5 stroke-[2.2] ${btn.iconColor}`} />
+                <Icon className={`w-5 h-5 stroke-[2.4] ${btn.iconColor}`} />
               </div>
 
-              <span className="text-sm font-black text-slate-900 dark:text-white tracking-tight">
+              <span className="text-[17px] font-black text-slate-950 dark:text-white tracking-tight">
                 +{formatAmount(btn.amount)}
               </span>
 
-              <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">
+              <span className="text-[11px] font-black text-slate-800 dark:text-slate-200 mt-0.5">
                 {btn.label}
               </span>
             </button>

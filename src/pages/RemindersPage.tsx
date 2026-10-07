@@ -47,7 +47,7 @@ export const RemindersPage: React.FC<RemindersPageProps> = ({
 
       <main className="flex-1 px-3.5 pt-1 pb-2 max-w-md mx-auto w-full flex flex-col gap-2.5 min-h-0">
         {/* Master Reminder Card */}
-        <div className="p-3.5 rounded-2xl bg-surface border border-surface-border shadow-2xs space-y-2.5">
+        <div id="tour-reminders-schedule" className="p-3.5 rounded-2xl bg-surface border border-surface-border shadow-2xs space-y-2.5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
               <div
@@ -150,13 +150,15 @@ export const RemindersPage: React.FC<RemindersPageProps> = ({
 
         {/* Schedule Timeline Preview */}
         {notifSettings.enabled && (
-          <ScheduleTimeline
-            slots={activeSlots}
-            unit={userSettings.unit}
-            todayTotalMl={todayTotalMl}
-            onToggleSlot={onToggleSlotActive}
-            isAutoSchedule={userSettings.autoSchedule}
-          />
+          <div id="tour-reminders-timeline" className="flex-1 min-h-0">
+            <ScheduleTimeline
+              slots={activeSlots}
+              unit={userSettings.unit}
+              todayTotalMl={todayTotalMl}
+              onToggleSlot={onToggleSlotActive}
+              isAutoSchedule={userSettings.autoSchedule}
+            />
+          </div>
         )}
       </main>
     </div>

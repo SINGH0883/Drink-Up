@@ -20,6 +20,7 @@ export const DEFAULT_USER_SETTINGS: UserSettings = {
   sleepTime: '23:00',
   autoSchedule: true,
   onboardingCompleted: false,
+  tourCompleted: false,
 };
 
 export const DEFAULT_NOTIFICATION_SETTINGS: NotificationSettings = {

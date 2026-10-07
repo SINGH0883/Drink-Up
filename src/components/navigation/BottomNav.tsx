@@ -25,8 +25,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ activeTab, onTabChange }) 
   };
 
   return (
-    <div className="w-full shrink-0 z-40 px-4 pb-3 pt-1 pointer-events-none">
-      <nav className="pointer-events-auto max-w-sm md:max-w-md mx-auto flex items-center justify-around px-2.5 py-1.5 rounded-full bg-surface/90 dark:bg-slate-900/90 backdrop-blur-2xl border border-surface-border/80 shadow-[0_12px_36px_-6px_rgba(0,0,0,0.16),0_2px_10px_rgba(0,0,0,0.08)] transition-all">
+    <div className="w-full shrink-0 z-40 px-4 pb-3 pt-1 pointer-events-none bg-transparent">
+      <nav id="tour-bottom-nav" className="pointer-events-auto max-w-sm md:max-w-md mx-auto flex items-center justify-around px-2.5 py-1.5 rounded-full bg-white/85 dark:bg-slate-900/85 backdrop-blur-2xl border border-white/60 dark:border-slate-800/80 shadow-[0_12px_36px_-6px_rgba(0,0,0,0.16),0_2px_10px_rgba(0,0,0,0.08)] transition-all">
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;

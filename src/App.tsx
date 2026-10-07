@@ -11,6 +11,7 @@ import { SettingsPage } from './pages/SettingsPage';
 import { NotificationSettingsPage } from './pages/NotificationSettingsPage';
 import { OnboardingPage } from './pages/OnboardingPage';
 import { InAppNotificationBanner } from './components/common/InAppNotificationBanner';
+import { AppTour } from './components/common/AppTour';
 import { storage } from './lib/storage';
 import { haptic } from './lib/haptics';
 
@@ -19,6 +20,7 @@ const TABS: TabType[] = ['home', 'history', 'reminders', 'settings'];
 export function App() {
   const [activeTab, setActiveTab] = useState<TabType>('home');
   const [subPage, setSubPage] = useState<'none' | 'notification_settings'>('none');
+  const [showTour, setShowTour] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const touchStartY = useRef<number | null>(null);
 
@@ -102,6 +104,18 @@ export function App() {
     };
   }, [subPage, activeTab]);
 
+  // Trigger tour automatically for first-time visitors who finished onboarding
+  useEffect(() => {
+    if (isLoaded && settings.onboardingCompleted && settings.tourCompleted !== true) {
+      setShowTour(true);
+    }
+  }, [isLoaded, settings.onboardingCompleted, settings.tourCompleted]);
+
+  const handleFinishTour = async () => {
+    await updateSettings({ tourCompleted: true });
+    setShowTour(false);
+  };
+
   const handleClearAllData = async () => {
     await storage.clear();
     await haptic.heavy();
@@ -160,6 +174,7 @@ export function App() {
                 undoEntry={undoEntry}
                 onUndoLastAdd={undoLastAdd}
                 onNavigateToReminders={() => setActiveTab('reminders')}
+                onStartTour={() => setShowTour(true)}
               />
             )}
 
@@ -193,6 +208,7 @@ export function App() {
                 onUpdateNotifSettings={updateNotifSettings}
                 onTestNotification={testNotification}
                 onClearAllData={handleClearAllData}
+                onStartTour={() => setShowTour(true)}
               />
             )}
           </div>
@@ -205,6 +221,15 @@ export function App() {
         onDismiss={dismissInAppBanner}
         onDrinkAction={(amount) => addWater(amount)}
       />
+
+      {/* Interactive App Tour Guide */}
+      {showTour && (
+        <AppTour
+          userName={settings.userName}
+          onFinish={handleFinishTour}
+          onNavigateTab={(tab) => setActiveTab(tab)}
+        />
+      )}
 
       {subPage === 'none' && <BottomNav activeTab={activeTab} onTabChange={setActiveTab} />}
     </div>
