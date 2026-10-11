@@ -2,8 +2,6 @@
 
 <div align="center">
 
-![Drink Up Logo](public/logo.png)
-
 ### *Stay Healthy • Stay Energised • Stay Hydrated* 🌊
 
 [![Platform: Android | Web](https://img.shields.io/badge/Platform-Android%20%7C%20Web-3DDC84?style=for-the-badge&logo=android&logoColor=white)](https://github.com/SINGH0883/Drink-Up)
@@ -17,7 +15,7 @@
 
 <br />
 
-[📥 **Download Android APK (5.29 MB)**](https://github.com/SINGH0883/Drink-Up/raw/main/drink-up.apk) • [✨ **Explore Features**](#-key-features) • [🛠️ **Developer Setup**](#-developer-guide--local-setup) • [📱 **Build APK**](#-building-the-android-apk)
+[📥 **Download Android APK (5.29 MB)**](https://github.com/SINGH0883/Drink-Up/raw/main/drink-up.apk) • [✨ **Explore Features**](#-key-features) • [🏠 **Home Page**](#-home-page--interface-breakdown) • [🔄 **Workflow**](#-application--hydration-workflow) • [🛠️ **Developer Setup**](#-developer-guide--local-setup)
 
 </div>
 
@@ -27,7 +25,9 @@
 
 - [About Drink Up](#-about-drink-up)
 - [Key Features](#-key-features)
-- [App Preview & UX Highlights](#-app-preview--ux-highlights)
+- [Home Page & Interface Breakdown](#-home-page--interface-breakdown)
+- [Application & Hydration Workflow](#-application--hydration-workflow)
+- [App Preview & Visual Showcase](#-app-preview--visual-showcase)
 - [Tech Stack](#-tech-stack)
 - [Project Architecture & Structure](#-project-architecture--structure)
 - [Developer Guide & Local Setup](#-developer-guide--local-setup)
@@ -83,15 +83,156 @@ Whether you are working at your desk, exercising, or on the move, Drink Up guara
 
 ---
 
-## 🎨 App Preview & UX Highlights
+## 🏠 Home Page & Interface Breakdown
+
+The **Drink Up Home Page** is designed with a mobile-first, high-focus UX that combines rich glassmorphic aesthetics, fluid animated wave dynamics, and lightning-fast one-tap actions.
+
+<div align="center">
+  <img src="public/screenshots/home-dashboard.png" width="290" alt="Drink Up Home Dashboard" style="border-radius: 20px; box-shadow: 0 12px 32px rgba(0,0,0,0.2);" />
+  <p><sub><b>Drink Up Live Home Screen:</b> Dynamic Greeting, Animated Water Canvas, Quick-Log Hub, and Two-Tone Status Bar</sub></p>
+</div>
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 💧 Drink Up - Mobile Home Screen Dashboard                  │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  [👋] Drink Up 🌙 Good night, Yuvii!     [🔥 3d] [❓] [🔔]  │
+│       Rest well and stay hydrated for tomorrow.             │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│                🌊 LIVE FLUID HYDRATION CANVAS 🌊            │
+│            (Dynamic rising water & ambient waves)           │
+│                                                             │
+│                                                             │
+│   ┌─────────────────────────────────────────────────────┐   │
+│   │ ⚡ Quick-Log Intake Presets                         │   │
+│   │ ┌───────────────┐ ┌───────────────┐ ┌─────────────┐ │   │
+│   │ │    +150 ml    │ │    +250 ml    │ │   +500 ml   │ │   │
+│   │ │   Small Cup   │ │  Glass (POP)  │ │   Bottle    │ │   │
+│   │ └───────────────┘ └───────────────┘ └─────────────┘ │   │
+│   └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│   ┌─────────────────────────────────────────────────────┐   │
+│   │ 🟢 0 ml drunk (0%)                 2,300 ml left 🔴 │   │
+│   │ ═══════════════════════════════════─────────────── │   │
+│   │ [=== Dynamic Emerald-to-Sky Progress Fill ===]      │   │
+│   └─────────────────────────────────────────────────────┘   │
+│                                                             │
+│   ┌─────────────────────────────────────────────────────┐   │
+│   │ ↩️ Logged +250 ml • Tap to Undo                 (3s)│   │
+│   └─────────────────────────────────────────────────────┘   │
+│                                                             │
+├─────────────────────────────────────────────────────────────┤
+│    [ 💧 Home ]     [ 📊 History ]    [ ⏰ Alerts ]   [ ⚙️ Settings ] │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 🧩 Home Page Component Highlights
+
+| Component | Architecture & Role | Visual & UX Behavior |
+| :--- | :--- | :--- |
+| **👋 Dynamic Header** | `HomePage.tsx` + `waving-hand-3d.png` | Adapts greeting automatically (*Morning, Afternoon, Evening, Night*), displays current streak badge (`🔥 Xd`), interactive tour guide trigger (`❓`), and quick reminder settings shortcut (`🔔`). |
+| **🌊 Fluid Water Canvas** | `hydrate-bg.gif` / `hydrate-bg.webp` | Full-screen background animation with gradient overlay creating an immersive, calm hydration atmosphere. |
+| **⚡ Quick-Log Hub** | `QuickAddButtons.tsx` | Instant 1-tap logging for 150ml, 250ml, and 500ml with tactile haptic vibration pulses (`@capacitor/haptics`). |
+| **🎛️ Custom Volume Modal** | `CustomAddModal.tsx` | Precision slider and quick-chip selector allowing exact volume logs for custom water bottles or mugs. |
+| **📊 Two-Tone Status Bar** | `tour-status-bar` in `HomePage.tsx` | Real-time dual indicator displaying completed intake (green pulsating dot) versus remaining goal (rose dot) with a smooth gradient progress fill. |
+| **↩️ Instant Undo Toast** | `UndoToast.tsx` | Non-intrusive floating toast with countdown timer to effortlessly revert accidental water entries. |
+| **🧭 1-Finger Gesture Nav** | `App.tsx` gesture listener | Smooth horizontal swipe gestures (Left/Right) allowing effortless one-handed switching across tabs. |
+
+---
+
+## 🔄 Application & Hydration Workflow
+
+The following flowchart illustrates the complete user lifecycle, smart scheduling, voice prompting, and offline persistence flow within **Drink Up**:
+
+```mermaid
+graph TD
+    %% Setup & Onboarding
+    Start(["🚀 Launch App"]) --> CheckOnboard{"First Time Launch?"}
+    CheckOnboard -- "Yes" --> Wizard["📋 5-Step Smart Onboarding Wizard\n(Name, Age, Gender, Weight, Climate)"]
+    Wizard --> CalcGoal["🎯 Calculate Personalized Goal\n(e.g., 2,500 ml / day)"]
+    CalcGoal --> TourGuide["🧭 Interactive App Tour\n(Highlight Key UI Controls)"]
+    TourGuide --> Home["🏠 Main Home Dashboard"]
+    CheckOnboard -- "No" --> Home
+
+    %% Background Engine & Reminders
+    Home --> ReminderEngine["⏰ Native Reminder Scheduler\n(@capacitor/local-notifications)"]
+    ReminderEngine --> CheckTime{"Within Active Hours?\n(e.g., 07:00 - 22:00)"}
+    CheckTime -- "Night / Sleep" --> Silent["🌙 Quiet Sleep Mode\n(Reminders Muted)"]
+    CheckTime -- "Active Hours" --> AlertTrigger["🔔 Interval Trigger Reached\n(30m / 45m / 1h / 2h)"]
+
+    %% Multi-Modal Alerting
+    AlertTrigger --> VoiceAlert["🗣️ Spoken Indian Female Voice Alert\n'Hey, time to drink water and stay hydrated!'"]
+    AlertTrigger --> Chime["🎵 Soothing Audio Chime Notification"]
+    AlertTrigger --> PushNotif["📲 System Push / In-App Banner Notification"]
+
+    %% User Action
+    VoiceAlert & Chime & PushNotif --> UserAction["👆 User Opens Drink Up / Taps Quick-Add"]
+    UserAction --> AddPreset["💧 Log Intake Amount\n(+150ml / +250ml / +500ml / Custom)"]
+
+    %% Logging & Storage
+    AddPreset --> Haptics["📳 Tactile Haptic Vibration Feedback"]
+    Haptics --> SaveStorage["💾 Local Storage Update\n(@capacitor/preferences - 100% Offline)"]
+    SaveStorage --> UpdateUI["📈 Update Real-Time Status Bar & Progress Strip"]
+
+    %% Undo & Milestone
+    UpdateUI --> UndoCheck{"Accidental Log?"}
+    UndoCheck -- "Tap Undo" --> Revert["↩️ Instant Undo Toast Reverts Entry"]
+    Revert --> SaveStorage
+    UndoCheck -- "Confirmed" --> CheckGoal{"Daily Goal Met?\n(Total >= Target)"}
+
+    CheckGoal -- "Target Reached (100%)" --> Confetti["🎉 Full-Screen Canvas Confetti Blast\n🔥 Consecutive Streak Counter +1"]
+    CheckGoal -- "Still Progressing" --> WaitNext["⏳ Await Next Scheduled Reminder"]
+
+    %% Analytics
+    Confetti & WaitNext --> HistoryAnalytics["📊 Weekly Bar Chart & Daily History Synced"]
+```
+
+### 🔁 Workflow Stages Explained
+
+1. **Intelligent Setup & Goal Calibration**  
+   New users are greeted with a frictionless 5-step onboarding wizard. By factoring in body weight, climate temperature, and daily physical activity level, the app calculates an optimal daily hydration baseline in milliliters or fluid ounces.
+2. **Smart Active-Hour Reminder Engine**  
+   Reminders are scheduled natively using `@capacitor/local-notifications`. The smart scheduler strictly observes designated wake and sleep windows (e.g., 07:00 to 22:00) so users are never disturbed during quiet rest hours.
+3. **Multi-Sensory Indian Voice Prompts**  
+   Unlike generic robotic beeps, Drink Up pairs soothing notification audio with expressive spoken Indian female voice guidance (*"Hey, it's time to drink water and stay hydrated!"*) along with gentle tactile vibration feedback.
+4. **Frictionless Quick-Logging & Safety Buffer**  
+   Users log water in seconds via calibrated quick-add presets (`150ml`, `250ml`, `500ml`) or custom volume sliders. An active **Undo Toast** appears for several seconds to allow immediate one-tap reversal if a quantity is entered mistakenly.
+5. **Gamified Streaks, Confetti & Weekly Analytics**  
+   Upon reaching 100% of the daily goal, celebratory confetti cascades across the screen and consecutive active streak counters advance. All logs are stored securely offline on the device using `@capacitor/preferences` and charted across a 7-day interactive history.
+
+---
+
+## 📱 App Preview & Visual Showcase
+
+A glimpse into the sleek UI, guided onboarding, and hands-free hydration reminder experience in **Drink Up**:
+
+<div align="center">
+
+| 📋 Onboarding Wizard | 🏠 Home Dashboard | 📊 Daily Hydration Status |
+| :---: | :---: | :---: |
+| <img src="public/screenshots/onboarding-wizard.png" width="225" alt="Setup Wizard" /> | <img src="public/screenshots/home-dashboard.png" width="225" alt="Drink Up Home Dashboard" /> | <img src="public/screenshots/tour-daily-status.png" width="225" alt="Daily Hydration Status Tour" /> |
+| **Step 1/5: Setup Wizard**<br/>Personalized intake calculation by age & weight | **Home Dashboard**<br/>Live water tracking, waving greeting & quick presets | **Step 1/8: Status Tour**<br/>Real-time drunk vs remaining goal tracker |
+
+| ⚡ Quick Log Presets | ⏰ Smart Reminder Schedule | 🗣️ Voice Alerts & Timetable |
+| :---: | :---: | :---: |
+| <img src="public/screenshots/tour-quick-log.png" width="225" alt="Quick Log Tour" /> | <img src="public/screenshots/reminders-schedule.png" width="225" alt="Smart Reminder Schedule" /> | <img src="public/screenshots/voice-alerts-timetable.png" width="225" alt="Voice Alerts Timetable" /> |
+| **Step 2/8: Quick Log**<br/>One-tap logging (+150ml, +250ml, +500ml) | **Step 4/8: Smart Reminders**<br/>Automatic wake/sleep interval timetable | **Step 5/8: Spoken Voice Alerts**<br/>Indian female voice & chime timetable |
+
+</div>
+
+### 🌟 Key UX Highlights
 
 | Feature | Description |
 | :--- | :--- |
-| **🌊 Live Wave Orb** | Visualizes current progress with smooth rising water waves and completion percentages. |
-| **📊 Quick Status Strip** | Two-tone progress strip showing consumed vs remaining volume at a glance. |
-| **👋 Dynamic Greeting** | Time-aware greeting header (*Good Morning, Good Afternoon, Good Evening*) with streak shortcuts. |
-| **⏰ Schedule Timeline** | Visual schedule showing upcoming reminder times across your active hours. |
-| **🏆 Milestone Celebrations** | Canvas confetti animations rewarding daily goal achievements. |
+| **🌊 Live Wave Background** | Smooth, calming water visuals with real-time gradient overlays. |
+| **📊 Two-Tone Status Bar** | Dual-colored live strip displaying exact volume drunk versus remaining target at a glance. |
+| **👋 Time-Aware Greeting** | Dynamic time-of-day greetings (*Morning, Afternoon, Evening, Night*) with streak flame counter. |
+| **⏰ Hands-Free Timetable** | Automatically calculates balanced drinking intervals based on wake and bedtime routines. |
+| **🗣️ Spoken Voice Guidance** | Natural Indian female voice prompts paired with gentle notification chimes. |
+| **🏆 Confetti Milestones** | Interactive celebratory confetti cascades rewarding 100% daily goal completions. |
 
 ---
 
@@ -122,7 +263,13 @@ Drink-Up/
 │   ├── app/                         # Android application module & manifest
 │   └── gradle/                      # Gradle wrapper configuration
 ├── public/                          # Static web assets, icons & media
-│   ├── logo.png                     # High-resolution 3D liquid logo
+│   ├── screenshots/                 # Application UI previews & tour screenshots
+│   │   ├── home-dashboard.png       # Live mobile home dashboard
+│   │   ├── onboarding-wizard.png    # Setup wizard & target calculator
+│   │   ├── reminders-schedule.png   # Smart schedule & timetable settings
+│   │   ├── tour-daily-status.png    # Real-time hydration status tour
+│   │   ├── tour-quick-log.png       # Quick log presets tour
+│   │   └── voice-alerts-timetable.png # Indian female voice alerts timetable
 │   ├── hydrate-bg.webp              # HD background texture
 │   └── circle-water.gif             # Wave animation asset
 ├── src/
